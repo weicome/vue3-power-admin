@@ -5,21 +5,18 @@
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
-  import { getUserList } from '@/api/_system/user'
+  import { getUserList, addUser, updateUser, deleteUser } from '@/api/_system/user'
   import type { UserInfoModel } from '@/api/_system/model/userModel'
   import { useMessage } from '@/hooks/web/useMessage'
 
   const tableModelRef = ref()
-  const router = useRouter()
-  const { $message } = useMessage()
+  const { $message, $msgbox } = useMessage()
 
-  const queryData = reactive({
+  const queryData = reactive<Record<string, any>>({
     username: '',
-    name: '',
-    gender: '',
-    role: '',
-    deptName: '',
-    post: ''
+    account: '',
+    status: '',
+    role: ''
   })
 
   const loading = ref(false)
@@ -31,9 +28,9 @@
       width: '160',
       slot: ({ row }: ColumnAttrs<UserInfoModel>) =>
         [
-          useSlotButton('详情', () => {
-            router.push(`/system/user/detail/${row.id}`)
-          }),
+          // useSlotButton('详情', () => {
+          //   router.push(`/system/user/detail/${row.id}`)
+          // }),
           useSlotButton('编辑', () => {
             handleUpdate(row)
           }),
@@ -46,8 +43,8 @@
   const tableData = ref<UserInfoModel[]>([])
   const selectedData = ref<UserInfoModel[]>([])
 
-  let pagination = reactive({
-    current: 1,
+  const pagination = reactive({
+    page: 1,
     size: 10,
     total: 100
   })
@@ -55,11 +52,13 @@
   const visible = ref(false)
   const submitType = ref(SubmitTypeEnum.ADD)
 
-  function handleQuery() {
-    loadData()
-  }
-
   function handleReset() {
+    queryData.value = {
+      username: '',
+      account: '',
+      status: '',
+      role: ''
+    }
     loadData()
   }
 
@@ -68,7 +67,7 @@
   }
 
   function handlePageChange(current: number) {
-    pagination.current = current
+    pagination.page = current
     loadData()
   }
 
@@ -78,7 +77,6 @@
   }
 
   function handleDelete(rows: UserInfoModel[]) {
-    const { $msgbox } = useMessage()
     $msgbox.confirm(
       '确认删除选中数据条目吗？',
       '提示',
@@ -88,90 +86,100 @@
         type: 'warning'
       }
     ).then(() => {
-      console.log('do delete:', rows)
-      loadData()
+      const ids: Array<string | number> = []
+      rows.forEach((item) => {
+        ids.push(item.id)
+      })
+      deleteUser<string | number>(ids).then(() => {
+        $message.success('删除成功！')
+        loadData()
+      }).catch((e) => {
+        $message.warning(e)
+      })
     })
   }
 
   function loadData() {
     loading.value = true
     setTimeout(async () => {
-      const { list, current, total, size } = await getUserList({
+      const { data, meta } = await getUserList({
         query: queryData,
         ...pagination
       })
-      pagination = { current, size, total }
+      pagination.page = meta.pagination.current_page
+      pagination.size = meta.pagination.per_page
+      pagination.total = meta.pagination.count
       loading.value = false
-      tableData.value = list
+      tableData.value = data
     }, 300)
   }
 
-  loadData()
-
-  let submitForm = reactive<Record<string, any>>({
+  const submitForm = reactive<UserInfoModel>({
+    id: '',
     username: '',
-    name: '',
-    gender: null,
-    mobile: '',
-    roles: [],
-    deptName: '',
-    posts: []
-  })
+    account: '',
+    password: '',
+    status: 1,
+    roles: []
+  } as unknown as UserInfoModel)
 
   function handleAdd() {
     submitType.value = SubmitTypeEnum.ADD
-    submitForm = reactive({
-      username: '',
-      name: '',
-      gender: null,
-      mobile: '',
-      roles: [],
-      deptName: '',
-      posts: []
-    })
     visible.value = true
   }
-
-  const submitFormRef = ref<FormInstance>()
-
+  function handleUpdate(row: UserInfoModel) {
+    submitType.value = SubmitTypeEnum.UPDATE
+    const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
+    rowData.roles = row.roles.map(r => r.id)
+    Object.assign(submitForm, rowData)
+    console.log(submitForm)
+    visible.value = true
+  }
   const rules = reactive<FormRules>({
     username: [
       { required: true, message: '请输入用户名', trigger: 'blur' }
     ],
-    name: [
-      { required: true, message: '请输入姓名', trigger: 'blur' }
+    account: [
+      { required: true, message: '请输入账号', trigger: 'blur' }
     ],
-    gender: [
-      { required: true, message: '请选择性别', trigger: 'change' }
-    ],
-    mobile: [
-      { required: true, message: '请输入联系电话', trigger: 'blur' }
+    status: [
+      { required: true, message: '请选择状态', trigger: 'change' }
     ],
     roles: [
-      { required: true, message: '请选择权限', trigger: 'change' }
+      { required: true, message: '请选择角色', trigger: 'change' }
     ]
   })
-
-  function handleUpdate(row: UserInfoModel) {
-    submitType.value = SubmitTypeEnum.UPDATE
-    const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
-    rowData.roles = row.roles.map(r => r.code)
-    rowData.posts = row.posts.map(p => p.code)
-    submitForm = rowData
-    visible.value = true
-  }
-
+  const submitFormRef = ref<FormInstance>()
   function handleSubmit() {
     submitFormRef.value?.validate((valid) => {
       if (valid) {
-        visible.value = false
-        $message.success('保存成功！')
+        if (submitType.value === SubmitTypeEnum.ADD) {
+          addUser(submitForm as UserInfoModel)
+            .then(() => {
+              visible.value = false
+              $message.success('保存成功！')
+              loadData()
+            }).catch((e) => {
+              $message.warning(e)
+            })
+        }
+        else {
+          updateUser(submitForm)
+            .then(() => {
+              visible.value = false
+              $message.success('保存成功！')
+              loadData()
+            }).catch((e) => {
+              $message.warning(e)
+            })
+        }
       }
       else {
         $message.warning('请完善必填选项！')
       }
     })
   }
+  loadData()
 </script>
 
 <template>
@@ -180,7 +188,7 @@
       v-model="queryData"
       :config="config"
       :per-line-count="4"
-      @query="handleQuery"
+      @query="loadData"
       @reset="handleReset"
     />
     <div flex items="center">
@@ -218,36 +226,25 @@
         style="width: 95%"
         status-icon
       >
+        <el-form-item label="账号" prop="account">
+          <el-input v-model="submitForm.account" placeholder="请输入" />
+        </el-form-item>
         <el-form-item label="用户名" prop="username">
           <el-input v-model="submitForm.username" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="submitForm.name" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-select v-model="submitForm.gender" style="width: 100%">
-            <el-option label="男" value="1" />
-            <el-option label="女" value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="电话" prop="mobile">
-          <el-input v-model="submitForm.mobile" placeholder="请输入" />
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="submitForm.password" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="权限" prop="roles">
           <el-select v-model="submitForm.roles" multiple style="width: 100%">
-            <el-option label="用户" value="1" />
-            <el-option label="管理员" value="0" />
+            <el-option label="用户" value="0" />
+            <el-option label="管理员" value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门" prop="deptName">
-          <el-input v-model="submitForm.deptName" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="岗位" prop="posts">
-          <el-select v-model="submitForm.posts" multiple style="width: 100%">
-            <el-option label="前端" value="0" />
-            <el-option label="后端" value="1" />
-            <el-option label="产品" value="2" />
-            <el-option label="测试" value="3" />
+        <el-form-item label="状态" prop="status">
+          <el-select v-model="submitForm.status" style="width: 100%">
+            <el-option label="正常" value="1" />
+            <el-option label="禁用" value="0" />
           </el-select>
         </el-form-item>
       </el-form>

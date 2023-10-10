@@ -23,7 +23,7 @@ export enum ErrorCodeEnum {
 }
 
 export enum CodeEnum {
-  SUCCESS = 0
+  SUCCESS = 200
 }
 
 export enum ContentTypeEnum {

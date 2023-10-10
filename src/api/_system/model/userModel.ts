@@ -3,14 +3,11 @@ import type { PostModel } from './postModel'
 
 export interface UserInfoModel {
   id: string | number
-  name: string
-  userId: number
+  account: string
   username: string
-  gender: string
   avatar: string
-  deptCode: Nullable<string>
-  deptName: Nullable<string>
-  mobile: Nullable<string>
+  password: Nullable<string>
+  status: number | string
   roles: Partial<RoleModel>[]
-  posts: Partial<PostModel>[]
+  created_at: string
 }

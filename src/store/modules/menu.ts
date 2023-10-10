@@ -5,7 +5,7 @@ import type { BuildMenuModel } from '@/api/_system/model/menuModel'
 import AdminLayout from '@/layouts/admin/index.vue'
 import { alertErrMsg } from '@/utils/message'
 import { ErrorCodeEnum } from '@/enums/httpEnum'
-import { buildMenuApi } from '@/api/_system/menu'
+import { buildMenuApi } from '@/api/_auth/index'
 
 interface MenuState {
   routes: AppRouteConfig[]
@@ -50,6 +50,7 @@ export const useMenuStore = defineStore('menu', {
   actions: {
     async generateRoutes() {
       const serverRoutes = await buildMenuApi()
+      console.log('serverRoutes', serverRoutes)
       try {
         this.routes = mapRoutes(serverRoutes)
       }

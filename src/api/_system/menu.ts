@@ -3,21 +3,39 @@ import type { BuildMenuModel, MenuModel } from './model/menuModel'
 import { useFetch } from '@/utils/http'
 
 enum Api {
-  BUILD_MENU = '/sysadmin/menu/build',
-  MENU_LIST = '/sysadmin/menu/list'
-}
+  MENU_LIST = '/admin/menu/index',
+  MENU_ADD = '/admin/menu/create',
+  MENU_SHOW = '/admin/menu/display',
+  MENU_MOD = '/admin/menu/modify',
+  MENU_DEL = '/admin/menu/delete'
 
-export const buildMenuApi = () => {
-  return useFetch.GET<BuildMenuModel[]>({
-    url: Api.BUILD_MENU,
-    useMock: true
-  })
 }
 
 export const getMenuList = (data: ListQuery) => {
   return useFetch.POST<ListResult<MenuModel>>({
     url: Api.MENU_LIST,
-    useMock: true,
+    useMock: false,
+    data
+  })
+}
+export const addMenu = (data: ListQuery) => {
+  return useFetch.POST<ListResult<MenuModel>>({
+    url: Api.MENU_ADD,
+    useMock: false,
+    data
+  })
+}
+export const updateMenu = (data: ListQuery) => {
+  return useFetch.POST<ListResult<MenuModel>>({
+    url: Api.MENU_MOD,
+    useMock: false,
+    data
+  })
+}
+export const deleteMenu = (data: ListQuery) => {
+  return useFetch.POST<ListResult<MenuModel>>({
+    url: Api.MENU_DEL,
+    useMock: false,
     data
   })
 }

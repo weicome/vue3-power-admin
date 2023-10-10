@@ -23,6 +23,7 @@ export default ({ mode }: ConfigEnv) => {
     VITE_PROXY_PREFIX,
     VITE_DROP_CONSOLE
   } = env
+  console.log('API ', VITE_BASE_API)
   return defineConfig({
     root,
     base: VITE_PUBLIC_PATH,

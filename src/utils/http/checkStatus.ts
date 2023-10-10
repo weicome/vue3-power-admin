@@ -37,6 +37,8 @@ const checkStatus: (status: number, msg: string, isCancel?: boolean) => void = (
     return
   }
   switch (status) {
+    case 200:
+      return
     case 400:
       alertErrMsg(ErrorCodeEnum.H400, msg)
       break

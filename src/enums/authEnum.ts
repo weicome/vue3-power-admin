@@ -1,5 +1,6 @@
 export enum AuthTypeEnum {
-  BASIC = 'basic'
+  BASIC = 'basic',
+  BEARER = 'Bearer'
 }
 
 export enum GrantTypeEnum {

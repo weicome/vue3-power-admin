@@ -12,13 +12,13 @@
   const showVerifyDialog = ref(false)
   const { $notify, $message } = useMessage()
   const loginForm = reactive<LoginParams>({
-    username: '',
+    account: '',
     password: '',
     rememberMe: false
   })
   const loginFormRef = ref<FormInstance>()
   const loginRules = reactive<FormRules>({
-    username: [{ required: true, message: t('home.usernameRule'), trigger: 'blur' }],
+    account: [{ required: true, message: t('home.usernameRule'), trigger: 'blur' }],
     password: [{ required: true, message: t('home.passwordRule'), trigger: 'blur' }]
   })
   const loading = ref<boolean>(false)
@@ -68,9 +68,9 @@
     </h1>
     <div m="t-12 mt-11" flex="~ col">
       <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules">
-        <el-form-item prop="username">
+        <el-form-item prop="account">
           <el-input
-            v-model="loginForm.username"
+            v-model="loginForm.account"
             size="large"
             :placeholder="`${$t('home.account')} admin`"
           />

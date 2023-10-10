@@ -38,5 +38,8 @@ export const useFetch = new CustomAxios({
   responseType: ResponseTypeEnum.JSON,
 
   // 忽略 CancelToken
-  ignoreCancelToken: false
+  ignoreCancelToken: false,
+
+  // 自动设置cookie
+  withCredentials: true
 })

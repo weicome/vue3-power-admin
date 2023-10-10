@@ -10,7 +10,7 @@
   }
 
   interface Pagination {
-    current: number
+    page: number
     size: number
     total: number
   }
@@ -64,7 +64,7 @@
   <div mt-4 flex justify-end>
     <el-pagination
       v-if="pageData"
-      v-model:current-page="pageData.current"
+      v-model:current-page="pageData.page"
       v-model:page-size="pageData.size"
       background
       layout="total, sizes, prev, pager, next, jumper"

@@ -1,7 +1,7 @@
 export type ApiParam = Record<string, any>
 
 export interface ListQuery<T = any> {
-  current: number
+  page: number
   size: number
   query?: Partial<T>
 }
@@ -12,10 +12,22 @@ export interface ListResult<T = any> {
   total: number
   list: T[]
 }
+export interface ListResuorce<T = any> {
+  data: T[]
+  meta: {
+    pagination: {
+      count: number
+      current_page: number
+      per_page: number
+      total: number
+      total_pages: number
+    }
+  }
+}
 
 export interface DateLogModel {
   createTime: string
-  createdBy: string
+  created_at: string
   updateTime: string
-  updatedBy: string
+  updated_at: string
 }

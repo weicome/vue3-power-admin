@@ -1,5 +1,5 @@
 export interface LoginParams {
-  username: string
+  account: string
   password: string
   rememberMe?: boolean
 }

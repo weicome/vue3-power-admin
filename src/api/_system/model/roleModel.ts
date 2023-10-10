@@ -2,8 +2,8 @@ import type { DateLogModel } from '@/api/model/baseModel'
 
 export interface RoleModel extends DateLogModel {
   id: number
-  code: string
+  symbol: string
   name: string
-  menu: number[]
-  description?: string
+  menus: number[]
+  remark?: string
 }

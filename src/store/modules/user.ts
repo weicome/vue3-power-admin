@@ -2,10 +2,10 @@ import { createCookie, removeCookies } from '@h/web/useCookie'
 import { defineStore } from 'pinia'
 import type { LoginParams, LoginResultModel } from '@/api/_auth/model'
 import type { UserInfoModel } from '@/api/_system/model/userModel'
-import { loginApi, tokenRefresh } from '@/api/_auth'
+import { loginApi, tokenRefresh, getAccountInfo, actAccountLogout } from '@/api/_auth'
 import { checkPassword } from '@/utils/regex'
 import { TokenTypeEnum } from '@/enums/authEnum'
-import { getAccountInfo } from '@/api/_system/user'
+
 import { router } from '@/router'
 
 interface UserState extends UserInfoModel {
@@ -25,35 +25,30 @@ function setTokenHelper({
 
 const initialUserState = {
   id: 0,
-  name: 'coder',
-  userId: -1,
+  account: 'coder',
   username: 'Toryz',
-  gender: '1',
+  password: '123456',
   avatar: 'https://avatars.githubusercontent.com/u/36221207?v=4',
-  deptCode: '007',
-  deptName: '开发部',
   mobile: '18812345678',
-  posts: [
-    { id: 1, code: 'FRONT-END', name: '前端' },
-    { id: 4, code: 'OPEN-SOURCE', name: '开源' }
-  ],
+  status: 1,
   roles: [
     { id: 0, code: 'ADMIN', name: '管理员', menu: [] }
   ],
+  created_at: '2019-01-01',
   security: true // 密码安全性
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => initialUserState,
   getters: {
-    invalid: state => state.userId === -1
+    invalid: state => state.id === -1
   },
   actions: {
     async login({
-      username,
+      account,
       password
     }: LoginParams): Promise<LoginResultModel> {
-      const data = await loginApi({ username, password })
+      const data = await loginApi({ account, password })
       if (!data) {
         return Promise.reject(new Error('login failed!'))
       }
@@ -78,7 +73,9 @@ export const useUserStore = defineStore('user', {
     logout(redirectUrl?: string) {
       this.$reset()
       removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN])
-      router.replace(`/login?redirect=${redirectUrl}`)
+      actAccountLogout().then(() => {
+        router.replace(`/login?redirect=${redirectUrl}`)
+      })
     }
   },
   persist: {
