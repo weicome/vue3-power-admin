@@ -1,10 +1,9 @@
-import AdminLayout from '@/layouts/admin/index.vue'
 import type { AppRouteConfig } from '@/router/types'
 
 const HomeRoute: AppRouteConfig = {
   path: '/home',
   name: 'home',
-  component: AdminLayout,
+  component: import('@/layouts/admin/index.vue'),
   redirect: '/home/dashboard',
   meta: {
     title: 'menu.home.root',

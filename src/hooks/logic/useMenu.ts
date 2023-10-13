@@ -26,7 +26,7 @@ export const routeToMenu = (routes: AppRouteConfig[]): Menu[] => {
       title: r?.meta?.title || 'title',
       index: resolveFullPath(r) || r.name,
       component: childMenu?.length ? ElSubMenu : ElMenuItem,
-      icon: r?.meta?.icon,
+      icon: r?.meta?.icon || '',
       ...(childMenu?.length && { children: routeToMenu(childMenu) })
     }
   })

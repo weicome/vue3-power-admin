@@ -98,7 +98,6 @@
     const user = toRaw(userStore.$state)
     const rowData: Record<string, any> = reactive(cloneDeep(user))
     rowData.roles = user.roles.map(r => r.id)
-    rowData.posts = user.posts.map(p => p.id)
     submitForm = rowData
   }
 </script>

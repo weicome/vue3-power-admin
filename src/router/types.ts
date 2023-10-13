@@ -5,3 +5,5 @@ export type AppRouteConfig = Omit<RouteRecordRaw, 'meta' | 'children'> & {
   meta?: RouteMeta
   children?: AppRouteConfig[]
 }
+
+export type RouteModule = Record<string, { default: AppRouteConfig }>

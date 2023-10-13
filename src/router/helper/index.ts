@@ -24,6 +24,7 @@ export function isRequiresAuthRoute(route: RouteLocationNormalized) {
   return !matched.some(r => r.meta?.requiresAuth === false)
 }
 
+// 添加路由
 export async function addAsyncRoutes() {
   const menuStore = useMenuStore()
   if (!menuStore.routes?.length) {

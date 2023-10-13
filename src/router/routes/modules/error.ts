@@ -1,4 +1,4 @@
-export const PageNotFoundRoute = {
+const PageNotFoundRoute = {
   path: '/:path(.*)*',
   name: 'PageNotFound',
   component: () => import('@/views/error/PageNotFound.vue'),
@@ -8,3 +8,4 @@ export const PageNotFoundRoute = {
     requiresAuth: false
   }
 }
+export default PageNotFoundRoute

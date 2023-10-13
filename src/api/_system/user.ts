@@ -1,4 +1,3 @@
-import { fa } from 'element-plus/es/locale'
 import type { ListQuery, ListResult, ListResuorce } from '../model/baseModel'
 import type { UserInfoModel } from './model/userModel'
 import { useFetch } from '@/utils/http'

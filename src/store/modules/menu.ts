@@ -1,5 +1,6 @@
 import type { RouteComponent } from 'vue-router'
 import { defineStore } from 'pinia'
+import { ro } from 'element-plus/es/locale'
 import type { AppRouteConfig } from '@/router/types'
 import type { BuildMenuModel } from '@/api/_system/model/menuModel'
 import AdminLayout from '@/layouts/admin/index.vue'
@@ -15,15 +16,19 @@ type RawRouteComponent = RouteComponent | (() => Promise<RouteComponent>)
 
 const pages = import.meta.glob('../../views/**/*.vue')
 
-function componentMap(path: string): RawRouteComponent {
-  switch (path) {
-    case 'Layout':
-      return AdminLayout
+function componentMap(component: string): RawRouteComponent {
+  let res = {} as RawRouteComponent
+  switch (component) {
+    case 'AdminLayout':
+      res = AdminLayout
+      break
     default: {
-      const joinPath = `admin/${path}`.replace(/\/\//, '/')
+      const joinPath = `${component}`.replace(/\/\//, '/')
       return pages[(`../../views/${joinPath}.vue`)]
     }
   }
+  console.log('AdminLayout', res)
+  return res
 }
 
 function mapRoutes(serverRoutes: BuildMenuModel[]): AppRouteConfig[] {
@@ -49,10 +54,11 @@ export const useMenuStore = defineStore('menu', {
   },
   actions: {
     async generateRoutes() {
-      const serverRoutes = await buildMenuApi()
-      console.log('serverRoutes', serverRoutes)
+      // const serverRoutes = await buildMenuApi()
       try {
-        this.routes = mapRoutes(serverRoutes)
+        // this.routes = mapRoutes(serverRoutes)
+        // console.log('store', this.routes)
+        this.routes = []
       }
       catch (error) {
         alertErrMsg(ErrorCodeEnum.C100, '路由转化异常')

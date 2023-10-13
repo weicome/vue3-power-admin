@@ -1,72 +1,52 @@
-import AdminLayout from '@/layouts/admin/index.vue'
 import type { AppRouteConfig } from '@/router/types'
 
 const SystemRoute: AppRouteConfig = {
-  path: '/system',
-  name: 'system',
-  component: AdminLayout,
+  path: '/admin',
+  name: 'Admin',
+  component: import('@/layouts/admin/index.vue'),
   meta: {
     title: 'menu.system.root',
     icon: 'ri:settings-4-fill'
   },
-  children: [{
-    path: 'menu',
-    name: 'menu',
-    component: () => import('@/views/admin/_system/menu/index.vue'),
-    meta: {
-      title: 'menu.system.menu'
+  children: [
+    {
+      path: 'user',
+      name: 'AdminUser',
+      component: () => import('@/views/admin/user/index.vue'),
+      meta: {
+        title: 'menu.system.user',
+        icon: 'ri:account-pin-box-fill'
+      }
+    },
+    {
+      path: 'role',
+      name: 'AdminRole',
+      component: () => import('@/views/admin/role/index.vue'),
+      meta: {
+        title: 'menu.system.role',
+        icon: 'ri:git-repository-private-line'
+      }
+    },
+    {
+      path: 'menu',
+      name: 'AdminMenu',
+      component: () => import('@/views/admin/menu/index.vue'),
+      meta: {
+        title: 'menu.system.menu',
+        icon: 'ri:menu-unfold-line'
+      }
+    },
+    {
+      path: 'user/detail/:id',
+      name: 'user_detail',
+      component: () => import('@/views/admin/user/detail.vue'),
+      meta: {
+        title: 'menu.system.userDetail',
+        hideMenu: true,
+        activeMenu: '/system/user'
+      }
     }
-  },
-  {
-    path: 'role',
-    name: 'role',
-    component: () => import('@/views/admin/_system/role/index.vue'),
-    meta: {
-      title: 'menu.system.role'
-    }
-  },
-  {
-    path: 'dict',
-    name: 'dict',
-    component: () => import('@/views/admin/_system/dict/index.vue'),
-    meta: {
-      title: 'menu.system.dict'
-    }
-  },
-  {
-    path: 'user',
-    name: 'user',
-    component: () => import('@/views/admin/_system/user/index.vue'),
-    meta: {
-      title: 'menu.system.user'
-    }
-  },
-  {
-    path: 'user/detail/:id',
-    name: 'user_detail',
-    component: () => import('@/views/admin/_system/user/detail.vue'),
-    meta: {
-      title: 'menu.system.userDetail',
-      hideMenu: true,
-      activeMenu: '/system/user'
-    }
-  },
-  {
-    path: 'department',
-    name: 'department',
-    component: () => import('@/views/admin/_system/department/index.vue'),
-    meta: {
-      title: 'menu.system.department'
-    }
-  },
-  {
-    path: 'post',
-    name: 'post',
-    component: () => import('@/views/admin/_system/post/index.vue'),
-    meta: {
-      title: 'menu.system.post'
-    }
-  }]
+  ]
 }
 
 export default SystemRoute

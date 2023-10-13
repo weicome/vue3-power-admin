@@ -4,7 +4,7 @@ import type { AppRouteConfig } from '@/router/types'
 const ComponentRoute: AppRouteConfig = {
   path: '/component',
   name: 'component',
-  component: AdminLayout,
+  component: import('@/layouts/admin/index.vue'),
   meta: {
     title: 'menu.component.root',
     icon: 'ri:dashboard-fill'

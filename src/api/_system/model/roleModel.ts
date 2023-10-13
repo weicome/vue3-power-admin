@@ -6,4 +6,5 @@ export interface RoleModel extends DateLogModel {
   name: string
   menus: number[]
   remark?: string
+  status: string | number
 }

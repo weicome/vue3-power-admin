@@ -1,7 +1,6 @@
 import type { AppRouteConfig } from '../types'
-import AdminRoutes from './modules/admin/index'
-import { PageNotFoundRoute } from './modules/error'
-import ScreenRoute from './modules/screen'
+
+import { routes as ModuleRoutes } from './modules'
 
 const RootRoute: AppRouteConfig = {
   path: '/',
@@ -18,11 +17,21 @@ const LoginRoute: AppRouteConfig = {
     requiresAuth: false
   }
 }
+const PageNotFoundRoute = {
+  path: '/:path(.*)*',
+  name: 'PageNotFound',
+  component: () => import('@/views/error/PageNotFound.vue'),
+  hidden: true,
+  meta: {
+    title: 'menu.error.notFound',
+    requiresAuth: false
+  }
+}
+// console.log('ModuleRoutes', ModuleRoutes)
 
 export const basicRoutes = [
   RootRoute,
   LoginRoute,
-  ScreenRoute,
-  ...AdminRoutes,
+  ...ModuleRoutes,
   PageNotFoundRoute
 ]

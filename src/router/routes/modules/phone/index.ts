@@ -1,24 +1,23 @@
 import type { AppRouteConfig } from '@/router/types'
-import ScreenLayout from '@/layouts/screen/index.vue'
 
-const ScreenRoute: AppRouteConfig = {
+const PhoneRoute: AppRouteConfig = {
   path: '/phone',
   name: 'Phone',
-  component: ScreenLayout,
-  redirect: '/screen/index',
+  component: import('@/layouts/admin/index.vue'),
+  redirect: '/phone/index',
   meta: {
-    title: '数据大屏'
+    title: '电话列表'
   },
   children: [
     {
       path: 'index',
-      name: 'MainScreen',
-      component: () => import('@/views/screen/index.vue'),
+      name: 'PhoneList',
+      component: () => import('@/views/phone/index.vue'),
       meta: {
-        title: '首页'
+        title: '电话列表'
       }
     }
   ]
 }
 
-export default ScreenRoute
+export default PhoneRoute

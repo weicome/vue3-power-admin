@@ -19,7 +19,8 @@
   const menuStore = useMenuStore()
 
   const menuData = computed(() => {
-    return routeToMenu(AdminRoutes.concat(menuStore.routes))
+    // return routeToMenu(AdminRoutes.concat(menuStore.routes))
+    return routeToMenu(AdminRoutes)
   })
 </script>
 

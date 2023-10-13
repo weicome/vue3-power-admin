@@ -1,11 +1,12 @@
 <script setup lang="ts" name="Menu">
+  import { match } from 'assert'
   import type { FormInstance, FormRules } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
   import { config, staticColumns, SubmitTypeEnum } from './usePage'
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
-  import { getMenuList } from '@/api/_system/menu'
+  import { getMenuList, addMenu, updateMenu, deleteMenu } from '@/api/_system/menu'
   import type { MenuModel } from '@/api/_system/model/menuModel'
   import { useMessage } from '@/hooks/web/useMessage'
 
@@ -14,7 +15,7 @@
 
   const queryData = reactive({
     title: '',
-    leaf: ''
+    type: ''
   })
 
   const loading = ref(false)
@@ -38,12 +39,6 @@
   const tableData = ref<MenuModel[]>([])
   const selectedData = ref<MenuModel[]>([])
 
-  let pagination = reactive({
-    current: 1,
-    size: 10,
-    total: 100
-  })
-
   const visible = ref(false)
   const submitType = ref(SubmitTypeEnum.ADD)
 
@@ -59,16 +54,6 @@
     selectedData.value = rows
   }
 
-  function handlePageChange(current: number) {
-    pagination.current = current
-    loadData()
-  }
-
-  function handleSizeChange(size: number) {
-    pagination.size = size
-    loadData()
-  }
-
   function handleDelete(rows: MenuModel[]) {
     const { $msgbox } = useMessage()
     $msgbox.confirm(
@@ -80,7 +65,16 @@
         type: 'warning'
       }
     ).then(() => {
-      console.log('do delete:', rows)
+      const ids: Array<string | number> = []
+      rows.forEach((item) => {
+        ids.push(item.id as number)
+      })
+      deleteMenu<string | number>(ids).then(() => {
+        $message.success('删除成功！')
+        loadData()
+      }).catch((e) => {
+        $message.warning(e)
+      })
       loadData()
     })
   }
@@ -88,39 +82,30 @@
   function loadData() {
     loading.value = true
     setTimeout(async () => {
-      const { list, current, total, size } = await getMenuList({
-        query: queryData,
-        ...pagination
-      })
-      pagination = { current, size, total }
+      const { data } = await getMenuList({ query: queryData })
       loading.value = false
-      tableData.value = list
+      tableData.value = data
     }, 300)
   }
 
   loadData()
 
-  let submitForm = reactive<Record<string, any>>({
+  const submitForm = reactive<MenuModel>({
     title: '',
-    leaf: '',
-    icon: '',
-    order: 1,
-    component: '',
     name: '',
-    redirect: ''
-  })
+    path: '',
+    icon: '',
+    component: '',
+    redirect: '',
+    pid: 0,
+    route: '',
+    type: 0,
+    status: 0,
+    sort: 1
+  } as unknown as MenuModel)
 
   function handleAdd() {
     submitType.value = SubmitTypeEnum.ADD
-    submitForm = reactive({
-      title: '',
-      leaf: '',
-      icon: '',
-      order: 1,
-      component: '',
-      name: '',
-      redirect: ''
-    })
     visible.value = true
   }
 
@@ -143,20 +128,48 @@
 
   function handleUpdate(row: MenuModel) {
     submitType.value = SubmitTypeEnum.UPDATE
-    submitForm = reactive(cloneDeep(toRaw(row)))
+    const rowData = reactive(cloneDeep(toRaw(row)))
+    Object.assign(submitForm, rowData)
     visible.value = true
   }
 
   function handleSubmit() {
     submitFormRef.value?.validate((valid) => {
       if (valid) {
-        visible.value = false
-        $message.success('保存成功！')
+        if (submitType.value === SubmitTypeEnum.ADD) {
+          addMenu(submitForm).then((res) => {
+            visible.value = false
+            $message.success('保存成功！')
+            loadData()
+          }).catch((e) => {
+            $message.warning(e)
+          })
+        }
+        else {
+          updateMenu(submitForm)
+            .then(() => {
+              visible.value = false
+              $message.success('保存成功！')
+              loadData()
+            }).catch((e) => {
+              $message.warning(e)
+            })
+        }
       }
       else {
         $message.warning('请完善必填选项！')
       }
     })
+  }
+
+  const pidSelect = reactive([
+    { label: '根目录', value: 0 }
+  ])
+  function selectTypeChange(row: number) {
+    Object.assign(pidSelect, [])
+    tableData.value.forEach(e =>
+      e.type === row && pidSelect.push({ label: e.title, value: e.id as number }
+      ))
   }
 </script>
 
@@ -179,14 +192,11 @@
     </div>
     <TableModel
       ref="tableModelRef"
-      v-model:pagination="pagination"
       :loading="loading"
       :columns="columns"
       :data="tableData"
       row-key="id"
       @selection-change="handleSelectionChange"
-      @page-change="handlePageChange"
-      @size-change="handleSizeChange"
     />
     <el-dialog
       v-model="visible"
@@ -204,20 +214,32 @@
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="名称" prop="title">
+        <el-form-item label="标题" prop="title">
           <el-input v-model="submitForm.title" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="类型" prop="leaf">
-          <el-select v-model="submitForm.leaf" style="width: 100%">
-            <el-option label="目录" :value="false" />
-            <el-option label="菜单" :value="true" />
-          </el-select>
+        <el-form-item label="路由名称" prop="name">
+          <el-input v-model="submitForm.name" placeholder="请输入路由名称" />
         </el-form-item>
         <el-form-item label="路由地址" prop="path">
           <el-input v-model="submitForm.path" placeholder="请输入路由地址" />
         </el-form-item>
-        <el-form-item label="路由名称" prop="name">
-          <el-input v-model="submitForm.name" placeholder="请输入路由名称" />
+        <el-form-item label="类型" prop="type">
+          <el-radio-group v-model="submitForm.type" @change="selectTypeChange">
+            <el-radio :label="0" border>
+              目录
+            </el-radio>
+            <el-radio :label="1" border>
+              菜单
+            </el-radio>
+            <el-radio :label="2" border>
+              按钮
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="上级菜单" prop="pid">
+          <el-select v-model="submitForm.pid" style="width: 100%">
+            <el-option v-for="(item, index) in pidSelect" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
         <el-form-item label="重定向地址" prop="redirect">
           <el-input v-model="submitForm.redirect" placeholder="请输入重定向地址" />
@@ -225,8 +247,21 @@
         <el-form-item label="组件目录" prop="component">
           <el-input v-model="submitForm.component" placeholder="请输入组件目录" />
         </el-form-item>
-        <el-form-item label="排序" prop="order">
-          <el-input v-model="submitForm.order" placeholder="请输入排序号" />
+        <el-form-item label="接口地址" prop="route">
+          <el-input v-model="submitForm.route" placeholder="请输入接口地址" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input v-model="submitForm.sort" placeholder="请输入排序号" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="submitForm.status">
+            <el-radio :label="1" border>
+              正常
+            </el-radio>
+            <el-radio :label="0" border>
+              禁用
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>

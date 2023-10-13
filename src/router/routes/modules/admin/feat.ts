@@ -4,7 +4,7 @@ import type { AppRouteConfig } from '@/router/types'
 const FeatRoute: AppRouteConfig = {
   path: '/feat',
   name: 'feat',
-  component: AdminLayout,
+  component: import('@/layouts/admin/index.vue'),
   meta: {
     title: 'menu.feat.root',
     icon: 'ri:rocket-2-fill'

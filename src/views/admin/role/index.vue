@@ -1,36 +1,30 @@
-<script setup lang="ts" name="User">
+<script setup lang="ts" name="Role">
   import type { FormInstance, FormRules } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
   import { config, staticColumns, SubmitTypeEnum } from './usePage'
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
-  import { getUserList, addUser, updateUser, deleteUser } from '@/api/_system/user'
-  import type { UserInfoModel } from '@/api/_system/model/userModel'
+  import { getRoleList, getRoleInfo, addRole, updateRole, deleteRole } from '@/api/_system/role'
+  import type { RoleModel } from '@/api/_system/model/roleModel'
   import { useMessage } from '@/hooks/web/useMessage'
+  import { getMenuTree } from '@/api/_system/menu'
 
   const tableModelRef = ref()
-  const { $message, $msgbox } = useMessage()
-
-  const queryData = reactive<Record<string, any>>({
-    username: '',
-    account: '',
-    status: '',
-    role: ''
-  })
-
+  const { $message } = useMessage()
   const loading = ref(false)
+  const queryData = reactive({
+    name: ''
+  })
+  const menuTree = reactive([])
   const columns = ref([
     ...staticColumns,
     {
       fixed: 'right',
       label: '操作',
       width: '160',
-      slot: ({ row }: ColumnAttrs<UserInfoModel>) =>
+      slot: ({ row }: ColumnAttrs<RoleModel>) =>
         [
-          // useSlotButton('详情', () => {
-          //   router.push(`/system/user/detail/${row.id}`)
-          // }),
           useSlotButton('编辑', () => {
             handleUpdate(row)
           }),
@@ -40,8 +34,8 @@
         ]
     }
   ])
-  const tableData = ref<UserInfoModel[]>([])
-  const selectedData = ref<UserInfoModel[]>([])
+  const tableData = ref<RoleModel[]>([])
+  const selectedData = ref<RoleModel[]>([])
 
   const pagination = reactive({
     page: 1,
@@ -52,17 +46,15 @@
   const visible = ref(false)
   const submitType = ref(SubmitTypeEnum.ADD)
 
-  function handleReset() {
-    queryData.value = {
-      username: '',
-      account: '',
-      status: '',
-      role: ''
-    }
+  function handleQuery() {
     loadData()
   }
 
-  function handleSelectionChange(rows: UserInfoModel[]) {
+  function handleReset() {
+    loadData()
+  }
+
+  function handleSelectionChange(rows: RoleModel[]) {
     selectedData.value = rows
   }
 
@@ -76,7 +68,8 @@
     loadData()
   }
 
-  function handleDelete(rows: UserInfoModel[]) {
+  function handleDelete(rows: RoleModel[]) {
+    const { $msgbox } = useMessage()
     $msgbox.confirm(
       '确认删除选中数据条目吗？',
       '提示',
@@ -90,7 +83,7 @@
       rows.forEach((item) => {
         ids.push(item.id)
       })
-      deleteUser<string | number>(ids).then(() => {
+      deleteRole<string | number>(ids).then(() => {
         $message.success('删除成功！')
         loadData()
       }).catch((e) => {
@@ -102,7 +95,7 @@
   function loadData() {
     loading.value = true
     setTimeout(async () => {
-      const { data, meta } = await getUserList({
+      const { data, meta } = await getRoleList({
         query: queryData,
         ...pagination
       })
@@ -114,39 +107,38 @@
     }, 300)
   }
 
-  const submitForm = reactive<UserInfoModel>({
-    id: '',
-    username: '',
-    account: '',
-    password: '',
-    status: 1,
-    roles: []
-  } as unknown as UserInfoModel)
+  loadData()
 
-  function handleAdd() {
+  const submitForm = reactive<RoleModel>({
+    name: '',
+    symbol: '',
+    menus: [],
+    remark: '',
+    status: 1
+  } as unknown as RoleModel)
+
+  async function handleAdd() {
+    await getMenuS()
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
   }
-  function handleUpdate(row: UserInfoModel) {
+  async function handleUpdate(row: RoleModel) {
+    await getMenuS()
     submitType.value = SubmitTypeEnum.UPDATE
-    const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
-    rowData.roles = row.roles.map(r => r.id)
+    const rowData = reactive(cloneDeep(toRaw(row)))
     Object.assign(submitForm, rowData)
     console.log(submitForm)
     visible.value = true
   }
   const rules = reactive<FormRules>({
-    username: [
-      { required: true, message: '请输入用户名', trigger: 'blur' }
+    name: [
+      { required: true, message: '请输入权限名称', trigger: 'blur' }
     ],
-    account: [
-      { required: true, message: '请输入账号', trigger: 'blur' }
+    symbol: [
+      { required: true, message: '请输入权限代码', trigger: 'blur' }
     ],
-    status: [
-      { required: true, message: '请选择状态', trigger: 'change' }
-    ],
-    roles: [
-      { required: true, message: '请选择角色', trigger: 'change' }
+    menus: [
+      { required: true, message: '请选择权限关联菜单', trigger: 'change' }
     ]
   })
   const submitFormRef = ref<FormInstance>()
@@ -154,17 +146,16 @@
     submitFormRef.value?.validate((valid) => {
       if (valid) {
         if (submitType.value === SubmitTypeEnum.ADD) {
-          addUser(submitForm as UserInfoModel)
-            .then(() => {
-              visible.value = false
-              $message.success('保存成功！')
-              loadData()
-            }).catch((e) => {
-              $message.warning(e)
-            })
+          addRole(submitForm).then((res) => {
+            visible.value = false
+            $message.success('保存成功！')
+            loadData()
+          }).catch((e) => {
+            $message.warning(e)
+          })
         }
         else {
-          updateUser(submitForm)
+          updateRole(submitForm)
             .then(() => {
               visible.value = false
               $message.success('保存成功！')
@@ -179,7 +170,11 @@
       }
     })
   }
-  loadData()
+
+  async function getMenuS() {
+    const menus = await getMenuTree()
+    Object.assign(menuTree, menus)
+  }
 </script>
 
 <template>
@@ -188,7 +183,7 @@
       v-model="queryData"
       :config="config"
       :per-line-count="4"
-      @query="loadData"
+      @query="handleQuery"
       @reset="handleReset"
     />
     <div flex items="center">
@@ -226,26 +221,38 @@
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="账号" prop="account">
-          <el-input v-model="submitForm.account" placeholder="请输入" />
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="submitForm.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="submitForm.username" placeholder="请输入" />
+        <el-form-item label="代码" prop="symbol">
+          <el-input v-model="submitForm.symbol" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="submitForm.password" placeholder="请输入" />
+        <el-form-item label="菜单" prop="menus">
+          <el-tree
+            style="width: 100%"
+            :data="menuTree"
+            show-checkbox
+            node-key="id"
+            :default-expanded-keys="submitForm.menus"
+            :default-checked-keys="submitForm.menus"
+            :props="{
+              children: 'children',
+              label: 'label',
+            }"
+          />
         </el-form-item>
-        <el-form-item label="权限" prop="roles">
-          <el-select v-model="submitForm.roles" multiple style="width: 100%">
-            <el-option label="用户" value="0" />
-            <el-option label="管理员" value="1" />
-          </el-select>
+        <el-form-item label="描述" prop="description">
+          <el-input v-model="submitForm.remark" type="textarea" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="submitForm.status" style="width: 100%">
-            <el-option label="正常" value="1" />
-            <el-option label="禁用" value="0" />
-          </el-select>
+          <el-radio-group v-model="submitForm.status">
+            <el-radio label="1" border>
+              正常
+            </el-radio>
+            <el-radio label="0" border>
+              禁用
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
