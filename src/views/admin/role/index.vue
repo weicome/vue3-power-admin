@@ -51,6 +51,7 @@
   }
 
   function handleReset() {
+    Object.assign(queryData, {})
     loadData()
   }
 
@@ -108,17 +109,22 @@
   }
 
   loadData()
-
-  const submitForm = reactive<RoleModel>({
+  const initialForm: RoleModel = {
     name: '',
     symbol: '',
     menus: [],
     remark: '',
-    status: 1
-  } as unknown as RoleModel)
-
+    status: 1,
+    id: 0,
+    createTime: '',
+    created_at: '',
+    updateTime: '',
+    updated_at: ''
+  }
+  const submitForm = reactive<RoleModel>(initialForm)
   async function handleAdd() {
     await getMenuS()
+    Object.assign(submitForm, initialForm)
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
   }
@@ -127,7 +133,6 @@
     submitType.value = SubmitTypeEnum.UPDATE
     const rowData = reactive(cloneDeep(toRaw(row)))
     Object.assign(submitForm, rowData)
-    console.log(submitForm)
     visible.value = true
   }
   const rules = reactive<FormRules>({
@@ -229,6 +234,7 @@
         </el-form-item>
         <el-form-item label="菜单" prop="menus">
           <el-tree
+            v-model="submitForm.menus"
             style="width: 100%"
             :data="menuTree"
             show-checkbox
@@ -246,10 +252,10 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="submitForm.status">
-            <el-radio label="1" border>
+            <el-radio :label="1" border>
               正常
             </el-radio>
-            <el-radio label="0" border>
+            <el-radio :label="0" border>
               禁用
             </el-radio>
           </el-radio-group>

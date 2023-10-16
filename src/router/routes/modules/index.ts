@@ -15,5 +15,5 @@ function handleModuleRoutes(modules: RouteModule) {
   return routes
 }
 const modules = import.meta.glob('./**/*.ts', { eager: true }) as RouteModule
-
+console.log('modules', modules)
 export const routes = handleModuleRoutes(modules)

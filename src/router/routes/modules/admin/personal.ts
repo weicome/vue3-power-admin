@@ -3,7 +3,7 @@ import type { AppRouteConfig } from '@/router/types'
 const PersonalRoute: AppRouteConfig = {
   path: '/personal',
   name: 'personal',
-  component: import('@/layouts/admin/index.vue'),
+  component: () => import('@/layouts/admin/index.vue'),
   redirect: '/personal/index',
   meta: {
     title: 'menu.personal',

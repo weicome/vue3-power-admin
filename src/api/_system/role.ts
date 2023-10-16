@@ -52,7 +52,7 @@ export const deleteRole = <T>(data: Array<T>) => {
 }
 
 export const getRoles = () => {
-  return useFetch.POST<RoleModel[]>({
+  return useFetch.POST<ListResuorce<RoleModel>>({
     url: Api.ROLE_LIST,
     useMock: false
   })

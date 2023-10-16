@@ -15,9 +15,9 @@ export interface MenuModel
   extends Omit<BuildMenuModel, 'meta' | 'children'>,
   DateLogModel {
   title: string
-  order: number
-  parentId: number
+  sort: number
+  pid: number
   icon: string
-  leaf: boolean
+  type: number
   [key: string]: any
 }

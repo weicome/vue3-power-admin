@@ -4,7 +4,7 @@
   import { MenuLayout } from '@/enums/menuEnum'
   import { useSettingStore } from '@/store/modules/setting'
   import { useMenuStore } from '@/store/modules/menu'
-  import AdminRoutes from '@/router/routes/modules/admin'
+  import { routes } from '@/router/routes/modules'
 
   const props = withDefaults(defineProps<{
     mode?: MenuLayout
@@ -20,7 +20,7 @@
 
   const menuData = computed(() => {
     // return routeToMenu(AdminRoutes.concat(menuStore.routes))
-    return routeToMenu(AdminRoutes)
+    return routeToMenu(routes)
   })
 </script>
 

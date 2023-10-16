@@ -1,5 +1,4 @@
 <script setup lang="ts" name="Menu">
-  import { match } from 'assert'
   import type { FormInstance, FormRules } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
   import { config, staticColumns, SubmitTypeEnum } from './usePage'
@@ -47,6 +46,7 @@
   }
 
   function handleReset() {
+    Object.assign(queryData, {})
     loadData()
   }
 
@@ -89,22 +89,27 @@
   }
 
   loadData()
-
-  const submitForm = reactive<MenuModel>({
+  const initialForm: MenuModel = {
+    id: 0,
+    pid: 0,
     title: '',
-    name: '',
-    path: '',
     icon: '',
     component: '',
-    redirect: '',
-    pid: 0,
-    route: '',
-    type: 0,
-    status: 0,
-    sort: 1
-  } as unknown as MenuModel)
+    path: '',
+    name: null,
+    permissions: [],
+    status: 1,
+    createTime: '',
+    created_at: '',
+    updateTime: '',
+    updated_at: '',
+    sort: 0,
+    type: 0
+  }
+  const submitForm = reactive<MenuModel>(initialForm)
 
   function handleAdd() {
+    Object.assign(submitForm, initialForm)
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
   }
@@ -162,15 +167,10 @@
     })
   }
 
-  const pidSelect = reactive([
-    { label: '根目录', value: 0 }
-  ])
-  function selectTypeChange(row: number) {
-    Object.assign(pidSelect, [])
-    tableData.value.forEach(e =>
-      e.type === row && pidSelect.push({ label: e.title, value: e.id as number }
-      ))
-  }
+  const pidSelect = computed(() => {
+    if (submitForm.type === 3) return
+    return [{ id: 0, title: '顶级目录' }, ...tableData.value.filter(e => e.type !== 2)]
+  })
 </script>
 
 <template>
@@ -224,7 +224,7 @@
           <el-input v-model="submitForm.path" placeholder="请输入路由地址" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
-          <el-radio-group v-model="submitForm.type" @change="selectTypeChange">
+          <el-radio-group v-model="submitForm.type">
             <el-radio :label="0" border>
               目录
             </el-radio>
@@ -238,7 +238,7 @@
         </el-form-item>
         <el-form-item label="上级菜单" prop="pid">
           <el-select v-model="submitForm.pid" style="width: 100%">
-            <el-option v-for="(item, index) in pidSelect" :key="index" :label="item.label" :value="item.value" />
+            <el-option v-for="(item, index) in pidSelect" :key="index" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="重定向地址" prop="redirect">

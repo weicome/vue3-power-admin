@@ -8,10 +8,13 @@
   import { getUserList, addUser, updateUser, deleteUser } from '@/api/_system/user'
   import type { UserInfoModel } from '@/api/_system/model/userModel'
   import { useMessage } from '@/hooks/web/useMessage'
+  import { getRoles } from '@/api/_system/role'
+  import type { RoleModel } from '@/api/_system/model/roleModel'
 
   const tableModelRef = ref()
   const { $message, $msgbox } = useMessage()
 
+  const roleSelectData = reactive<RoleModel[]>([] as unknown as RoleModel[])
   const queryData = reactive<Record<string, any>>({
     username: '',
     account: '',
@@ -46,19 +49,14 @@
   const pagination = reactive({
     page: 1,
     size: 10,
-    total: 100
+    total: 0
   })
 
   const visible = ref(false)
   const submitType = ref(SubmitTypeEnum.ADD)
 
   function handleReset() {
-    queryData.value = {
-      username: '',
-      account: '',
-      status: '',
-      role: ''
-    }
+    Object.assign(queryData, {})
     loadData()
   }
 
@@ -113,21 +111,25 @@
       tableData.value = data
     }, 300)
   }
-
-  const submitForm = reactive<UserInfoModel>({
+  const initialForm: UserInfoModel = {
     id: '',
-    username: '',
     account: '',
-    password: '',
+    username: '',
+    avatar: '',
+    password: null,
     status: 1,
-    roles: []
-  } as unknown as UserInfoModel)
-
-  function handleAdd() {
+    roles: [],
+    created_at: ''
+  }
+  const submitForm = reactive<UserInfoModel>(initialForm)
+  async function handleAdd() {
+    await getRoleList()
+    Object.assign(submitForm, {})
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
   }
-  function handleUpdate(row: UserInfoModel) {
+  async function handleUpdate(row: UserInfoModel) {
+    await getRoleList()
     submitType.value = SubmitTypeEnum.UPDATE
     const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
     rowData.roles = row.roles.map(r => r.id)
@@ -177,6 +179,10 @@
         $message.warning('请完善必填选项！')
       }
     })
+  }
+  async function getRoleList(): Promise<void> {
+    const { data } = await getRoles()
+    Object.assign(roleSelectData, data)
   }
   loadData()
 </script>
@@ -234,17 +240,20 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="submitForm.password" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="权限" prop="roles">
+        <el-form-item label="角色" prop="roles">
           <el-select v-model="submitForm.roles" multiple style="width: 100%">
-            <el-option label="用户" value="0" />
-            <el-option label="管理员" value="1" />
+            <el-option v-for="(item, index) in roleSelectData" :key="index" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="submitForm.status" style="width: 100%">
-            <el-option label="正常" value="1" />
-            <el-option label="禁用" value="0" />
-          </el-select>
+          <el-radio-group v-model="submitForm.status">
+            <el-radio :label="1" border>
+              正常
+            </el-radio>
+            <el-radio :label="0" border>
+              禁用
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
