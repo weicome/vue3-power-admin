@@ -16,7 +16,7 @@
     <el-container h="full" bg="root">
       <LayoutSider />
       <el-container>
-        <el-header h="auto" p-0 bg="page">
+        <el-header style="height: auto;" p-0 bg="page">
           <LayoutHeader />
           <LayoutTabs v-if="hasTabView" />
         </el-header>

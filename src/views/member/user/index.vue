@@ -5,21 +5,17 @@
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
-  import { getUserList, addUser, updateUser, deleteUser } from '@/api/_system/user'
-  import type { UserInfoModel } from '@/api/_system/model/userModel'
+  import { getMemberUserList, addMemberUser, updateMemberUser, deleteMemberUser } from '@/api/member/user'
+  import type { MemberUserModel } from '@/api/member/model/MemberModel'
   import { useMessage } from '@/hooks/web/useMessage'
-  import { getRoles } from '@/api/_system/role'
-  import type { RoleModel } from '@/api/_system/model/roleModel'
 
   const tableModelRef = ref()
   const { $message, $msgbox } = useMessage()
 
-  const roleSelectData = reactive<RoleModel[]>([] as unknown as RoleModel[])
   const queryData = reactive<Record<string, any>>({
-    username: '',
-    account: '',
-    status: '',
-    role: ''
+    name: '',
+    email: '',
+    status: ''
   })
 
   const loading = ref(false)
@@ -43,8 +39,8 @@
         ]
     }
   ])
-  const tableData = ref<UserInfoModel[]>([])
-  const selectedData = ref<UserInfoModel[]>([])
+  const tableData = ref<MemberUserModel[]>([])
+  const selectedData = ref<MemberUserModel[]>([])
 
   const pagination = reactive({
     page: 1,
@@ -60,7 +56,7 @@
     loadData()
   }
 
-  function handleSelectionChange(rows: UserInfoModel[]) {
+  function handleSelectionChange(rows: MemberUserModel[]) {
     selectedData.value = rows
   }
 
@@ -74,7 +70,7 @@
     loadData()
   }
 
-  function handleDelete(rows: UserInfoModel[]) {
+  function handleDelete(rows: MemberUserModel[]) {
     $msgbox.confirm(
       '确认删除选中数据条目吗？',
       '提示',
@@ -88,7 +84,7 @@
       rows.forEach((item) => {
         ids.push(item.id)
       })
-      deleteUser<string | number>(ids).then(() => {
+      deleteMemberUser<string | number>(ids).then(() => {
         $message.success('删除成功！')
         loadData()
       }).catch((e) => {
@@ -100,7 +96,7 @@
   function loadData() {
     loading.value = true
     setTimeout(async () => {
-      const { data, meta } = await getUserList({
+      const { data, meta } = await getMemberUserList({
         query: queryData,
         ...pagination
       })
@@ -111,43 +107,41 @@
       tableData.value = data
     }, 300)
   }
-  const initialForm: UserInfoModel = {
-    id: '',
-    account: '',
-    username: '',
-    avatar: '',
-    password: null,
-    status: 1,
-    roles: [],
-    created_at: ''
+  const initialForm: MemberUserModel = {
+    id: 0,
+    name: '',
+    email: '',
+    password: '',
+    status: '',
+    createTime: '',
+    created_at: '',
+    updateTime: '',
+    updated_at: ''
   }
-  const submitForm = reactive<UserInfoModel>(initialForm)
+  const submitForm = reactive<MemberUserModel>(initialForm)
   async function handleAdd() {
-    await getRoleList()
     Object.assign(submitForm, {})
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
   }
-  async function handleUpdate(row: UserInfoModel) {
-    await getRoleList()
+  async function handleUpdate(row: MemberUserModel) {
     submitType.value = SubmitTypeEnum.UPDATE
     const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
-    rowData.roles = row.roles.map(r => r.id)
     Object.assign(submitForm, rowData)
     visible.value = true
   }
   const rules = reactive<FormRules>({
-    username: [
-      { required: true, message: '请输入用户名', trigger: 'blur' }
+    name: [
+      { required: true, message: '名称', trigger: 'blur' }
     ],
-    account: [
+    email: [
       { required: true, message: '请输入账号', trigger: 'blur' }
+    ],
+    password: [
+      { required: true, message: '请输入密码', trigger: 'blur' }
     ],
     status: [
       { required: true, message: '请选择状态', trigger: 'change' }
-    ],
-    roles: [
-      { required: true, message: '请选择角色', trigger: 'change' }
     ]
   })
   const submitFormRef = ref<FormInstance>()
@@ -155,7 +149,7 @@
     submitFormRef.value?.validate((valid) => {
       if (valid) {
         if (submitType.value === SubmitTypeEnum.ADD) {
-          addUser(submitForm as UserInfoModel)
+          addMemberUser(submitForm as MemberUserModel)
             .then(() => {
               visible.value = false
               $message.success('保存成功！')
@@ -165,7 +159,7 @@
             })
         }
         else {
-          updateUser(submitForm)
+          updateMemberUser(submitForm)
             .then(() => {
               visible.value = false
               $message.success('保存成功！')
@@ -179,10 +173,6 @@
         $message.warning('请完善必填选项！')
       }
     })
-  }
-  async function getRoleList(): Promise<void> {
-    const { data } = await getRoles()
-    Object.assign(roleSelectData, data)
   }
   loadData()
 </script>
@@ -231,19 +221,14 @@
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="账号" prop="account">
-          <el-input v-model="submitForm.account" placeholder="请输入" />
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="submitForm.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="submitForm.username" placeholder="请输入" />
+        <el-form-item label="账号" prop="email">
+          <el-input v-model="submitForm.email" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="submitForm.password" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="角色" prop="roles">
-          <el-select v-model="submitForm.roles" multiple style="width: 100%">
-            <el-option v-for="(item, index) in roleSelectData" :key="index" :label="item.name" :value="item.id" />
-          </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="submitForm.status">

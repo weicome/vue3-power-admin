@@ -6,7 +6,8 @@ const PhoneRoute: AppRouteConfig = {
   component: () => import('@/layouts/admin/index.vue'),
   redirect: '/phone/index',
   meta: {
-    title: '电话列表'
+    title: '电话列表',
+    icon: 'ri:bookmark-line'
   },
   children: [
     {
