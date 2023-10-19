@@ -29,7 +29,7 @@ export default {
       workbench: '工作台'
     },
     system: {
-      root: '系统管理',
+      root: '后台管理',
       menu: '菜单管理',
       role: '权限管理',
       dict: '字典管理',

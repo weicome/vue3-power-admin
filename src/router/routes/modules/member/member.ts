@@ -6,22 +6,22 @@ const MemberRoute: AppRouteConfig = {
   component: () => import('@/layouts/admin/index.vue'),
   redirect: '/member/user',
   meta: {
-    title: '会员中心',
+    title: '用户管理',
     icon: 'ri:checkbox-multiple-fill'
   },
   children: [{
-    path: 'user',
-    name: 'MemberUser',
+    path: 'users',
+    name: 'MemberUsers',
     component: () => import('@/views/member/user/index.vue'),
     meta: {
-      title: '会员列表'
+      title: '组员管理'
     }
   }, {
-    path: 'phone',
-    name: 'MemberPhone',
-    component: () => import('@/views/member/phone/index.vue'),
+    path: 'leader',
+    name: 'MemberLeader',
+    component: () => import('@/views/member/leader/index.vue'),
     meta: {
-      title: '会员电话'
+      title: '电销组长'
     }
   }]
 }

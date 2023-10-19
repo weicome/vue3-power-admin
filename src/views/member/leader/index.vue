@@ -1,4 +1,4 @@
-<script setup lang="ts" name="MemberPhone">
+<script setup lang="ts" name="MemberLeader">
   import type { FormInstance, FormRules } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
   import { config, staticColumns, SubmitTypeEnum } from './usePage'
@@ -9,14 +9,17 @@
   import { useMessage } from '@/hooks/web/useMessage'
   import TableModel, { useSlotButton } from '@/components/TableModel'
 
+  const { params } = useRoute()
+  const queryData = reactive<Record<string, any>>({
+    phone: '',
+    member_id: params.member_id
+  })
+
   const { $message, $msgbox } = useMessage()
   const tableModelRef = ref()
   const visible = ref(false)
   const submitType = ref(SubmitTypeEnum.ADD)
   const submitFormRef = ref<FormInstance>()
-  const queryData = reactive<Record<string, any>>({
-    phone: ''
-  })
   const loading = ref(false)
   const tableData = ref<MemberPhoneModel[]>([])
   const pagination = reactive({

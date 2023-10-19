@@ -1,5 +1,5 @@
 <script setup lang="ts" name="Phone">
-  import type { FormInstance, FormRules } from 'element-plus'
+  import { genFileId, type FormInstance, type FormRules, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
   import { config, staticColumns, SubmitTypeEnum } from './usePage'
   import { getPhoneList, addPhone, updatePhone, deletePhone, uploadPhone } from '@/api/phone'
@@ -163,6 +163,16 @@
     })
   }
   loadData()
+  const uploadRef = ref<UploadInstance>()
+  const handleExceed: UploadProps['onExceed'] = (files) => {
+    uploadRef.value?.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    uploadRef.value!.handleStart(file)
+  }
+  const submitUpload = () => {
+    uploadRef.value!.submit()
+  }
 </script>
 
 <template>
@@ -181,9 +191,20 @@
       <el-button type="danger" :disabled="!selectedData.length" @click="handleDelete(selectedData)">
         <div i-ri-delete-bin-line mr-1 /> 删除
       </el-button>
-      <el-button type="primary">
-        <div i-ri-upload-cloud-fill mr-1 /> 上传
-      </el-button>
+      <el-upload
+        ref="uploadRef"
+        :action="uploadPhone"
+        :limit="1"
+        :auto-upload="false"
+        with-credentials="true"
+        accept=""
+        :on-exceed="handleExceed"
+        :on-success="loadData"
+      >
+        <el-button class="ml-3" type="success" @click="submitUpload">
+          <div i-ri-upload-cloud-fill mr-1 /> 上传
+        </el-button>
+      </el-upload>
     </div>
     <TableModel
       ref="tableModelRef"

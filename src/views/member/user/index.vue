@@ -8,6 +8,7 @@
   import { getMemberUserList, addMemberUser, updateMemberUser, deleteMemberUser } from '@/api/member/user'
   import type { MemberUserModel } from '@/api/member/model/MemberModel'
   import { useMessage } from '@/hooks/web/useMessage'
+  import { router } from '@/router'
 
   const tableModelRef = ref()
   const { $message, $msgbox } = useMessage()
@@ -25,11 +26,11 @@
       fixed: 'right',
       label: '操作',
       width: '160',
-      slot: ({ row }: ColumnAttrs<UserInfoModel>) =>
+      slot: ({ row }: ColumnAttrs<MemberUserModel>) =>
         [
-          // useSlotButton('详情', () => {
-          //   router.push(`/system/user/detail/${row.id}`)
-          // }),
+          useSlotButton('电话本', () => {
+            router.push(`/member/phone/${row.id}`)
+          }),
           useSlotButton('编辑', () => {
             handleUpdate(row)
           }),

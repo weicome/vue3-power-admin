@@ -52,6 +52,7 @@ declare module '@vue/runtime-core' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElTree: typeof import('element-plus/es')['ElTree']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     Guide: typeof import('./../src/components/Guide/src/Guide.vue')['default']
     GuideStep: typeof import('./../src/components/Guide/src/GuideStep.vue')['default']
     Line: typeof import('./../src/components/ECharts/src/Line/index.vue')['default']
