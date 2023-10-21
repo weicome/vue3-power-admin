@@ -9,7 +9,8 @@ export enum Api {
   USER_MOD = '/member/user/modify',
   USER_DEL = '/member/user/delete',
   USER_ROLE_PRE = '/member/user/role',
-  UPDATE_USER_PASSWORD = '/member/user/changePassword'
+  UPDATE_USER_PASSWORD = '/member/user/changePassword',
+  USER_BATCH = '/member/user/batch'
 }
 
 export const getMemberUserList = (data: ListQuery) => {
@@ -39,5 +40,19 @@ export const deleteMemberUser = <T>(data: Array<T>) => {
     url: Api.USER_DEL,
     useMock: false,
     data: { ids: data }
+  })
+}
+export const batchAddMemberUser = (data: any) => {
+  return useFetch.POST<MemberUserModel>({
+    url: Api.USER_BATCH,
+    useMock: false,
+    data
+  })
+}
+export const telMemberUserStat = <T>(data: T) => {
+  return useFetch.POST<MemberLeaderModel>({
+    url: Api.Leader_DEL,
+    useMock: false,
+    data
   })
 }

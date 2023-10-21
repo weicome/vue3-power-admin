@@ -14,29 +14,33 @@ export const createPermissionGuard = (router: Router) => {
     // fix async route 404 after refresh page
     const nextRoute = to.matched[0].name === 'PageNotFound' ? { path: to.fullPath } : to
     if (isRequiresAuthRoute(to)) {
-      if (!checkAccessToken()) {
-        await userStore.reLogin()
-        await addAsyncRoutes()
-        next({ replace: true, ...nextRoute })
+      console.log('to', to.name)
+      if (userStore.invalid) { // 未登录
+        console.log('invalid', userStore.invalid)
+        return next()
+        next({ replace: true, name: 'login' })
       }
       else {
-        userStore.invalid && (await userStore.setUserInfo())
-        if (!menuStore.hasRoutes) {
-          console.log(1)
+        if (!checkAccessToken()) { // 登录过期
+          console.log('checkAccessToken', to.name)
+          await userStore.reLogin()
           await addAsyncRoutes()
-          console.log('route', router.getRoutes())
-          console.log('from', from)
-          console.log('to', to)
-          next({ replace: true })
-          // next({ replace: true, ...nextRoute })
+          return next()
         }
         else {
-          next()
+          if (!menuStore.hasRoutes) { // 没有生成路由
+            await addAsyncRoutes()
+          }
+          console.log('hasRoutes', to.name)
+          return next()
         }
       }
     }
     else {
-      next()
+      if (!userStore.invalid) { // 已登录
+        next({ replace: true, name: 'home' })
+      }
+      else next()
     }
   })
 }

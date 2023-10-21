@@ -5,7 +5,7 @@ import { routes as ModuleRoutes } from './modules'
 const RootRoute: AppRouteConfig = {
   path: '/',
   name: 'Root',
-  redirect: '/login'
+  redirect: '/home'
 }
 
 const LoginRoute: AppRouteConfig = {

@@ -7,7 +7,7 @@ import { router } from '@/router'
 import config from '@/config'
 
 export function checkAccessToken() {
-  return !config.OAUTH.execute || useCookie(TokenTypeEnum.ACCESS_TOKEN)
+  return !config.OAUTH.execute || useCookie(TokenTypeEnum.ACCESS_TOKEN) !== undefined
 }
 
 export function isBasicRoute(route: RouteLocationNormalized) {

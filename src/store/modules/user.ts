@@ -24,7 +24,7 @@ function setTokenHelper({
 }
 
 const initialUserState = {
-  id: 0,
+  id: -1,
   account: 'coder',
   username: 'Toryz',
   password: '123456',
@@ -60,6 +60,7 @@ export const useUserStore = defineStore('user', {
 
     async reLogin(): Promise<LoginResultModel> {
       const data = await tokenRefresh()
+      console.log(data)
       setTokenHelper(data)
       await this.setUserInfo()
       return data

@@ -4,14 +4,14 @@ const MemberRoute: AppRouteConfig = {
   path: '/member',
   name: 'Member',
   component: () => import('@/layouts/admin/index.vue'),
-  redirect: '/member/user',
+  redirect: '/member/users',
   meta: {
     title: '用户管理',
     icon: 'ri:checkbox-multiple-fill'
   },
   children: [{
     path: 'users',
-    name: 'MemberUsers',
+    name: 'MemberUser',
     component: () => import('@/views/member/user/index.vue'),
     meta: {
       title: '组员管理'

@@ -5,18 +5,19 @@
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
-  import { getMemberUserList, addMemberUser, updateMemberUser, deleteMemberUser } from '@/api/member/user'
+  import * as memberUserApi from '@/api/member/user'
   import type { MemberUserModel } from '@/api/member/model/MemberModel'
   import { useMessage } from '@/hooks/web/useMessage'
   import { router } from '@/router'
 
   const tableModelRef = ref()
   const { $message, $msgbox } = useMessage()
+  const submitType = ref({ label: SubmitTypeEnum.ADD as string, val: 0 })
 
   const queryData = reactive<Record<string, any>>({
-    name: '',
-    email: '',
-    status: ''
+    leader_id: '',
+    type: '',
+    phone: ''
   })
 
   const loading = ref(false)
@@ -28,18 +29,33 @@
       width: '160',
       slot: ({ row }: ColumnAttrs<MemberUserModel>) =>
         [
-          useSlotButton('电话本', () => {
-            router.push(`/member/phone/${row.id}`)
-          }),
-          useSlotButton('编辑', () => {
+          useSlotButton('修改', () => {
             handleUpdate(row)
-          }),
+          }, { type: 'success' }),
           useSlotButton('删除', () => {
             handleDelete([row])
-          }, { type: 'danger' })
+          }, { type: 'danger' }),
+          useSlotButton('IP白名单', () => {
+            handleIpChange(row)
+          }, { type: 'success' }),
+          useSlotButton('拨打统计', () => {
+            handleStat(row)
+          }, { type: 'success' })
         ]
     }
   ])
+  const submitFormIP = reactive<Record<string, any>>({})
+  const handleIpChange = (row: MemberUserModel) => {
+    submitFormIP.value = { ip: '', id: row.id }
+    submitType.value = { label: SubmitTypeEnum.IP, val: 2 }
+    visible.value = true
+  }
+  const statData = reactive<Record<string, any>>({})
+  const handleStat = (row: MemberUserModel) => {
+    statData.value = memberUserApi.telMemberUserStat({ id: row.id })
+    submitType.value = { label: `组长《${row.username}》${SubmitTypeEnum.STAT}`, val: 3 }
+    visible.value = true
+  }
   const tableData = ref<MemberUserModel[]>([])
   const selectedData = ref<MemberUserModel[]>([])
 
@@ -50,7 +66,6 @@
   })
 
   const visible = ref(false)
-  const submitType = ref(SubmitTypeEnum.ADD)
 
   function handleReset() {
     Object.assign(queryData, {})
@@ -85,7 +100,7 @@
       rows.forEach((item) => {
         ids.push(item.id)
       })
-      deleteMemberUser<string | number>(ids).then(() => {
+      memberUserApi.deleteMemberUser<string | number>(ids).then(() => {
         $message.success('删除成功！')
         loadData()
       }).catch((e) => {
@@ -97,7 +112,7 @@
   function loadData() {
     loading.value = true
     setTimeout(async () => {
-      const { data, meta } = await getMemberUserList({
+      const { data, meta } = await memberUserApi.getMemberUserList({
         query: queryData,
         ...pagination
       })
@@ -108,25 +123,14 @@
       tableData.value = data
     }, 300)
   }
-  const initialForm: MemberUserModel = {
-    id: 0,
-    name: '',
-    email: '',
-    password: '',
-    status: '',
-    createTime: '',
-    created_at: '',
-    updateTime: '',
-    updated_at: ''
-  }
-  const submitForm = reactive<MemberUserModel>(initialForm)
+  const submitForm = reactive<MemberUserModel>({} as unknown as MemberUserModel)
   async function handleAdd() {
     Object.assign(submitForm, {})
-    submitType.value = SubmitTypeEnum.ADD
+    submitType.value = { label: SubmitTypeEnum.ADD, val: 0 }
     visible.value = true
   }
   async function handleUpdate(row: MemberUserModel) {
-    submitType.value = SubmitTypeEnum.UPDATE
+    submitType.value = { label: SubmitTypeEnum.UPDATE, val: 1 }
     const rowData: Record<string, any> = reactive(cloneDeep(toRaw(row)))
     Object.assign(submitForm, rowData)
     visible.value = true

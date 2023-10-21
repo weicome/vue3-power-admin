@@ -1,6 +1,5 @@
 import type { RouteComponent } from 'vue-router'
 import { defineStore } from 'pinia'
-import { ro } from 'element-plus/es/locale'
 import type { AppRouteConfig } from '@/router/types'
 import type { BuildMenuModel } from '@/api/_system/model/menuModel'
 import AdminLayout from '@/layouts/admin/index.vue'

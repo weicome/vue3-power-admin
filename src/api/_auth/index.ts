@@ -44,7 +44,7 @@ export const tokenRefresh = () => {
   return useFetch.POST<LoginResultModel>({
     url: Api.Refresh,
     withToken: true,
-    useMock: true,
+    useMock: false,
     data: {
       refresh_token: useCookie(TokenTypeEnum.REFRESH_TOKEN),
       grant_type: GrantTypeEnum.REFRESH_TOKEN

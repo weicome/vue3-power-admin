@@ -4,7 +4,7 @@ const StatRoute: AppRouteConfig = {
   path: '/stat',
   name: 'Stat',
   component: () => import('@/layouts/admin/index.vue'),
-  redirect: '/phone/index',
+  redirect: '/stat/summary',
   meta: {
     title: '推广统计',
     icon: 'ri:bookmark-line'

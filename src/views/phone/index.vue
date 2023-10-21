@@ -24,17 +24,10 @@
     size: 10,
     total: 0
   })
-  const initialForm: PhoneModel = {
-    id: 0,
-    phone: '',
-    batch: '',
-    status: 1,
-    createTime: '',
-    created_at: '',
-    updateTime: '',
-    updated_at: ''
-  }
-  const submitForm = reactive<PhoneModel>(initialForm)
+
+  const submitForm = reactive<Record<string, any>>({
+    leader_id: 0
+  })
   const columns = ref([
     ...staticColumns,
     {
@@ -85,7 +78,7 @@
     loadData()
   }
   const selectedData = ref<PhoneModel[]>([])
-  const handleAdd = async () => {
+  const handleButton = async (id: number) => {
     Object.assign(submitForm, {})
     submitType.value = SubmitTypeEnum.ADD
     visible.value = true
@@ -119,20 +112,6 @@
     })
   }
 
-  const rules = reactive<FormRules>({
-    username: [
-      { required: true, message: '请输入用户名', trigger: 'blur' }
-    ],
-    account: [
-      { required: true, message: '请输入账号', trigger: 'blur' }
-    ],
-    status: [
-      { required: true, message: '请选择状态', trigger: 'change' }
-    ],
-    roles: [
-      { required: true, message: '请选择角色', trigger: 'change' }
-    ]
-  })
   function handleSubmit() {
     submitFormRef.value?.validate((valid) => {
       if (valid) {
@@ -185,26 +164,18 @@
       @reset="handleReset"
     />
     <div flex items="center">
-      <el-button type="primary" @click="handleAdd">
+      <el-button type="success" @click="handleButton(0)">
         <div i-ri-add-fill mr-1 /> 新增
       </el-button>
-      <el-button type="danger" :disabled="!selectedData.length" @click="handleDelete(selectedData)">
-        <div i-ri-delete-bin-line mr-1 /> 删除
+      <el-button type="primary" @click="handleButton(1)">
+        <div i-ri-exchange-box-fill mr-1 /> 导出并清除所有数据
       </el-button>
-      <el-upload
-        ref="uploadRef"
-        :action="uploadPhone"
-        :limit="1"
-        :auto-upload="false"
-        with-credentials="true"
-        accept=""
-        :on-exceed="handleExceed"
-        :on-success="loadData"
-      >
-        <el-button class="ml-3" type="success" @click="submitUpload">
-          <div i-ri-upload-cloud-fill mr-1 /> 上传
-        </el-button>
-      </el-upload>
+      <el-button type="danger" @click="handleButton(2)">
+        <div i-ri-format-clear mr-1 /> 清除所有数据
+      </el-button>
+      <el-button type="danger" @click="handleButton(3)">
+        <div i-ri-delete-bin-line mr-1 /> 批次删除
+      </el-button>
     </div>
     <TableModel
       ref="tableModelRef"
@@ -228,7 +199,6 @@
       <el-form
         ref="submitFormRef"
         :model="submitForm"
-        :rules="rules"
         label-width="100px"
         style="width: 95%"
         status-icon

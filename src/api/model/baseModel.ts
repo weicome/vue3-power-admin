@@ -26,8 +26,6 @@ export interface ListResuorce<T = any> {
 }
 
 export interface DateLogModel {
-  createTime: string
   created_at: string
-  updateTime: string
   updated_at: string
 }
