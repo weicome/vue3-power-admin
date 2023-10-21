@@ -50,8 +50,8 @@ export const batchAddMemberUser = (data: any) => {
   })
 }
 export const telMemberUserStat = <T>(data: T) => {
-  return useFetch.POST<MemberLeaderModel>({
-    url: Api.Leader_DEL,
+  return useFetch.POST<MemberUserModel>({
+    url: Api.USER_BATCH,
     useMock: false,
     data
   })

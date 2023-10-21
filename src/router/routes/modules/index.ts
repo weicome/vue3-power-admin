@@ -9,7 +9,7 @@ function handleModuleRoutes(modules: RouteModule) {
       routes.push(item)
     }
     else {
-      window.console.error(`路由模块解析出错: key = ${key}`)
+      // window.console.error(`路由模块解析出错: key = ${key}`)
     }
   })
   return routes

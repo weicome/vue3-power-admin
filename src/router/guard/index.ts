@@ -25,7 +25,8 @@ export function setupRouterGuard(router: Router) {
  */
 function createTitleGuard(router: Router) {
   router.beforeEach((to) => {
-    document.title = i18n.global.t((to.meta.title || config.APP.title) as string)
+    // document.title = i18n.global.t((to.meta.title || config.APP.title) as string)
+    document.title = (to.meta.title || config.APP.title) as string
   })
 }
 

@@ -42,7 +42,7 @@
     }
   ])
   const loadData = () => {
-    loading.value = true
+    // loading.value = true
     setTimeout(async () => {
       const { data, meta } = await leaderApi.getMemberLeaderList({ ...pagination })
       pagination.page = meta.pagination.current_page

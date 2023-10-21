@@ -153,8 +153,8 @@
   function handleSubmit() {
     submitFormRef.value?.validate((valid) => {
       if (valid) {
-        if (submitType.value === SubmitTypeEnum.ADD) {
-          addMemberUser(submitForm as MemberUserModel)
+        if (submitType.value.val === 0) {
+          memberUserApi.addMemberUser(submitForm as MemberUserModel)
             .then(() => {
               visible.value = false
               $message.success('保存成功！')
@@ -164,7 +164,7 @@
             })
         }
         else {
-          updateMemberUser(submitForm)
+          memberUserApi.updateMemberUser(submitForm)
             .then(() => {
               visible.value = false
               $message.success('保存成功！')
@@ -195,6 +195,9 @@
       <el-button type="primary" @click="handleAdd">
         <div i-ri-add-fill mr-1 /> 新增
       </el-button>
+      <el-button type="primary" @click="handleAdd">
+        <div i-ri-user-add-line mr-1 /> 批量添加
+      </el-button>
       <el-button type="danger" :disabled="!selectedData.length" @click="handleDelete(selectedData)">
         <div i-ri-delete-bin-line mr-1 /> 删除
       </el-button>
@@ -213,7 +216,7 @@
     <el-dialog
       v-model="visible"
       :width="600"
-      :title="submitType"
+      :title="submitType.label"
       :show-close="false"
       :close-on-click-modal="false"
       @closed="submitFormRef?.resetFields()"
@@ -227,7 +230,7 @@
         status-icon
       >
         <el-form-item label="名称" prop="name">
-          <el-input v-model="submitForm.name" placeholder="请输入" />
+          <el-input v-model="submitForm.username" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="账号" prop="email">
           <el-input v-model="submitForm.email" placeholder="请输入" />

@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { registerGlobComp } from '@c/register'
 import App from './App.vue'
+
 import { setupI18n } from '@/locales'
 import { setupStore } from '@/store'
 import { router, setupRouter } from '@/router'

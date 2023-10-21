@@ -5,7 +5,7 @@ export interface MemberUserModel extends DateLogModel {
   leader_id: number
   type: number
   username: string
-  password: string
+  password?: string
   phone: string
   email: string
   status: string | number
@@ -17,12 +17,12 @@ export interface MemberUserModel extends DateLogModel {
 export interface MemberLeaderModel extends DateLogModel {
   id: number
   username: string
-  password: string
+  password?: string
   phone: string
   email: string
   encry?: number
   upload?: number
-  is_leader?: number
+  in_leader?: number
   callback?: number
   lasted_at?: string
   lasted_ip?: string

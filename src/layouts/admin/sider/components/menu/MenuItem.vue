@@ -19,7 +19,7 @@
     <Icon v-if="icon && !isSubMenu" class="icon" :icon="icon" />
     <template #title>
       <Icon v-if="icon && isSubMenu" class="icon" :icon="icon" />
-      <span>{{ $t(title) }}</span>
+      <span>{{ title }}</span>
     </template>
     <template v-if="children?.length">
       <MenuItem v-for="child in children" :key="child.index" v-bind="child" />

@@ -11,7 +11,7 @@
         :key="r.path"
         v-bind="r.path !== route.path ? { to: r.path } : {}"
       >
-        {{ $t(r.meta.title!) }}
+        {{ r.meta.title! }}
       </el-breadcrumb-item>
     </transition-group>
   </el-breadcrumb>

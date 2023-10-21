@@ -16,7 +16,6 @@
   const activeRoute = computed(() => route.matched.findLast(r => !r?.meta?.hideMenu) || route) // last route of no `hideMenu` in meta
 
   const settingStore = useSettingStore()
-  const menuStore = useMenuStore()
 
   const menuData = computed(() => {
     // return routeToMenu(AdminRoutes.concat(menuStore.routes))
