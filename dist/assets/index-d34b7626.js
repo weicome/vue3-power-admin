@@ -1,0 +1,1 @@
+import{_ as o,f as t}from"./index-f35f11d1.js";import"./vue-bfef4675.js";import"./element-plus-bdb0d49b.js";import"./mockjs-de833af9.js";import"./vue-i18n-81613396.js";import"./pinia-574b3635.js";import"./vue-router-1f08ac7c.js";import"./nprogress-c3ec224b.js";import"./axios-dc3e32a0.js";const c=o(t,[["__scopeId","data-v-5f0aadd9"]]);export{c as default};

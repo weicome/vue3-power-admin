@@ -1,7 +1,15 @@
 import type { TableColumnCtx } from 'element-plus/es/components/table/src/table-column/defaults'
 import type { ButtonProps, SwitchProps, TagProps } from 'element-plus'
 import { ElButton, ElTag, ElSwitch } from 'element-plus'
+import type { Slot } from 'vue'
 
+export interface Column {
+  prop?: string
+  label?: string
+  width?: string | number
+  align?: string
+  slot?: Slot
+}
 export interface ColumnAttrs<T> {
   row: T
   column: TableColumnCtx<T>

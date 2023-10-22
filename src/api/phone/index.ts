@@ -5,23 +5,16 @@ import { useFetch } from '@/utils/http'
 export enum Api {
   PHONE_INDEX = '/phone/index',
   PHONE_ADD = '/phone/create',
-  PHONE_SHOW = '/phone/display',
-  PHONE_MOD = '/phone/modify',
-  PHONE_DEL = '/phone/delete',
-  PHONE_UP = '/phone/upload'
+  PHONE_EXPORT = '/phone/export',
+  PHONE_CLEAR = '/phone/clear',
+  PHONE_BATCHDEL = '/phone/delete',
+  PHONE_UPLOAD = '/phone/upload',
+  PHONE_BATCH = '/phone/batch'
 }
 
 export const getPhoneList = (data: ListQuery) => {
   return useFetch.POST<ListResuorce<PhoneModel>>({
     url: Api.PHONE_INDEX,
-    useMock: false,
-    data
-  })
-}
-
-export const getPhoneInfo = (data: any) => {
-  return useFetch.GET<PhoneModel>({
-    url: Api.PHONE_SHOW,
     useMock: false,
     data
   })
@@ -34,26 +27,38 @@ export const addPhone = (data: PhoneModel) => {
     data
   })
 }
-
-export const updatePhone = (data: PhoneModel) => {
+export const exportPhone = (data: Partial<PhoneModel>) => {
   return useFetch.POST<PhoneModel>({
-    url: Api.PHONE_MOD,
+    url: Api.PHONE_EXPORT,
+    useMock: false,
+    data
+  })
+}
+export const clearPhone = () => {
+  return useFetch.POST<PhoneModel>({
+    url: Api.PHONE_CLEAR,
+    useMock: false
+  })
+}
+export const deletePhone = (data: Partial<PhoneModel>) => {
+  return useFetch.POST<PhoneModel>({
+    url: Api.PHONE_BATCHDEL,
     useMock: false,
     data
   })
 }
 
-export const deletePhone = <T>(data: Array<T>) => {
-  return useFetch.POST<PhoneModel>({
-    url: Api.PHONE_DEL,
+export const uploadPhone = (data: any) => {
+  return useFetch.POST<Array<any>>({
+    url: Api.PHONE_UPLOAD,
     useMock: false,
-    data: { ids: data }
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data
   })
 }
-
-export const uploadPhone = () => {
-  return useFetch.POST({
-    url: Api.PHONE_UP,
+export const getPhoneBatch = () => {
+  return useFetch.POST<Array<any>>({
+    url: Api.PHONE_BATCH,
     useMock: false
   })
 }

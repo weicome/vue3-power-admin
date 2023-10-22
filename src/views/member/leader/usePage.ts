@@ -20,7 +20,6 @@ export const config: SearchItemConfig[] = [
 
 // table model static column config
 export const staticColumns = [
-  { fixed: true, prop: 'id', label: '编号', width: '70', align: 'center' },
   { prop: 'username', label: '账号', width: '180' },
   { prop: 'phone', label: '手机号', width: '180' },
   { prop: 'email', label: '邮箱', width: '180' },

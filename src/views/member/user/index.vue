@@ -1,14 +1,13 @@
 <script setup lang="ts" name="MemberUser">
   import type { FormInstance, FormRules } from 'element-plus'
   import { cloneDeep } from 'lodash-es'
-  import { config, staticColumns, SubmitTypeEnum } from './usePage'
+  import { config, staticColumns, SubmitTypeEnum, leaders, groupType } from './usePage'
   import SearchModel from '@/components/SearchModel'
   import type { ColumnAttrs } from '@/components/TableModel'
   import TableModel, { useSlotButton } from '@/components/TableModel'
   import * as memberUserApi from '@/api/member/user'
   import type { MemberUserModel } from '@/api/member/model/MemberModel'
   import { useMessage } from '@/hooks/web/useMessage'
-  import { router } from '@/router'
 
   const tableModelRef = ref()
   const { $message, $msgbox } = useMessage()
@@ -53,7 +52,7 @@
   const statData = reactive<Record<string, any>>({})
   const handleStat = (row: MemberUserModel) => {
     statData.value = memberUserApi.telMemberUserStat({ id: row.id })
-    submitType.value = { label: `组长《${row.username}》${SubmitTypeEnum.STAT}`, val: 3 }
+    submitType.value = { label: `组员《${row.username}》${SubmitTypeEnum.STAT}`, val: 3 }
     visible.value = true
   }
   const tableData = ref<MemberUserModel[]>([])
@@ -124,9 +123,9 @@
     }, 300)
   }
   const submitForm = reactive<MemberUserModel>({} as unknown as MemberUserModel)
-  async function handleAdd() {
-    Object.assign(submitForm, {})
-    submitType.value = { label: SubmitTypeEnum.ADD, val: 0 }
+  async function handleAdd(val: number) {
+    Object.assign(submitForm, { status: 1 })
+    submitType.value = { label: val === 0 ? SubmitTypeEnum.ADD : SubmitTypeEnum.BATCH, val }
     visible.value = true
   }
   async function handleUpdate(row: MemberUserModel) {
@@ -136,17 +135,8 @@
     visible.value = true
   }
   const rules = reactive<FormRules>({
-    name: [
-      { required: true, message: '名称', trigger: 'blur' }
-    ],
-    email: [
-      { required: true, message: '请输入账号', trigger: 'blur' }
-    ],
-    password: [
-      { required: true, message: '请输入密码', trigger: 'blur' }
-    ],
-    status: [
-      { required: true, message: '请选择状态', trigger: 'change' }
+    username: [
+      { required: true, message: '账号', trigger: 'blur' }
     ]
   })
   const submitFormRef = ref<FormInstance>()
@@ -192,10 +182,10 @@
       @reset="handleReset"
     />
     <div flex items="center">
-      <el-button type="primary" @click="handleAdd">
+      <el-button type="primary" @click="handleAdd(0)">
         <div i-ri-add-fill mr-1 /> 新增
       </el-button>
-      <el-button type="primary" @click="handleAdd">
+      <el-button type="primary" @click="handleAdd(5)">
         <div i-ri-user-add-line mr-1 /> 批量添加
       </el-button>
       <el-button type="danger" :disabled="!selectedData.length" @click="handleDelete(selectedData)">
@@ -215,13 +205,14 @@
     />
     <el-dialog
       v-model="visible"
-      :width="600"
+      :width="560"
       :title="submitType.label"
       :show-close="false"
       :close-on-click-modal="false"
       @closed="submitFormRef?.resetFields()"
     >
       <el-form
+        v-if="submitType.val === 0 || submitType.val === 1"
         ref="submitFormRef"
         :model="submitForm"
         :rules="rules"
@@ -229,30 +220,33 @@
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="名称" prop="name">
+        <el-form-item label="账号" prop="username">
           <el-input v-model="submitForm.username" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="账号" prop="email">
-          <el-input v-model="submitForm.email" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="submitForm.password" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="submitForm.status">
-            <el-radio :label="1" border>
-              正常
-            </el-radio>
-            <el-radio :label="0" border>
-              禁用
-            </el-radio>
-          </el-radio-group>
+        <el-form-item label="归属组长" prop="leader_id">
+          <el-select v-model="submitForm.leader_id" style="width: 100%">
+            <el-option v-for="(item, index) in leaders" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="组员类型" prop="type">
+          <el-select v-model="submitForm.type" style="width: 100%">
+            <el-option v-for="(item, index) in groupType" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="手机号码" prop="phone">
+          <el-input v-model="submitForm.phone" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="submitForm.email" placeholder="请输入" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">
+          <el-button v-if="submitType.val !== 3" type="primary" @click="handleSubmit">
             保存
           </el-button>
         </span>

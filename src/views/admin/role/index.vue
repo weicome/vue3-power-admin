@@ -116,9 +116,7 @@
     remark: '',
     status: 1,
     id: 0,
-    createTime: '',
     created_at: '',
-    updateTime: '',
     updated_at: ''
   }
   const submitForm = reactive<RoleModel>(initialForm)

@@ -1,13 +1,5 @@
 <script setup lang="ts" name="TableModel">
-  import type { Slot } from 'vue'
-
-  interface Column {
-    prop?: string
-    label?: string
-    width?: string | number
-    align?: string
-    slot?: Slot
-  }
+  import type { Column } from '..'
 
   interface Pagination {
     page: number

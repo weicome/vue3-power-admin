@@ -13,7 +13,7 @@ import { i18n } from '@/locales'
  * @param router
  */
 export function setupRouterGuard(router: Router) {
-  // createPermissionGuard(router)
+  createPermissionGuard(router)
   createTitleGuard(router)
   createHttpGuard(router)
   createNProgressGuard(router)

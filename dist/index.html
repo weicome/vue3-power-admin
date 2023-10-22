@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+    <script type="module" crossorigin src="/assets/index-f35f11d1.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vue-bfef4675.js">
+    <link rel="modulepreload" crossorigin href="/assets/mockjs-de833af9.js">
+    <link rel="modulepreload" crossorigin href="/assets/element-plus-bdb0d49b.js">
+    <link rel="modulepreload" crossorigin href="/assets/vue-i18n-81613396.js">
+    <link rel="modulepreload" crossorigin href="/assets/pinia-574b3635.js">
+    <link rel="modulepreload" crossorigin href="/assets/vue-router-1f08ac7c.js">
+    <link rel="modulepreload" crossorigin href="/assets/nprogress-c3ec224b.js">
+    <link rel="modulepreload" crossorigin href="/assets/axios-dc3e32a0.js">
+    <link rel="stylesheet" href="/assets/index-7ade58e4.css">
+    <script type="module">import.meta.url;import("_").catch(()=>1);async function* g(){};if(location.protocol!="file:"){window.__vite_is_modern_browser=true}</script>
+    <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy chunks, syntax error above and the same error below should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
+  </head>
+  <body>
+    <script>
+      (() => {
+        let htmlRoot = document.documentElement
+        let theme = window.localStorage.getItem('vueuse-color-scheme')
+        const hasLoading = window.localStorage.getItem('vp_has_fp_loading')
+        if (hasLoading === 'false') htmlRoot.classList.add('hide-loading')
+        if (htmlRoot && theme) {
+          htmlRoot.setAttribute('data-theme', theme)
+          theme = htmlRoot = null
+        }
+      })()
+    </script>
+    <div id="app">
+      <style>
+
+        html, body {
+          margin: 0;
+          padding: 0;
+        }
+
+        .hide-loading .fp-loading-container {
+          display: none;
+        }
+
+        html[data-theme='dark'] .fp-loading-container {
+          background-color: black;
+        }
+
+        .fp-loading-container {
+          width: 100vw;
+          height: 100vh;
+        }
+
+
+        @keyframes rotate {
+          to {
+            transform: rotate(405deg)
+          }
+        }
+
+        .fp-loading {
+          width: 300px;
+          height: 300px;
+          position:absolute;
+          top: 45%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          filter: url(#gooey);
+        }
+
+        .fp-loading span {
+          position: absolute;
+          top: 20%;
+          left: 20%;
+          width: 60%;
+          height: 60%;
+          transform: rotate(45deg);
+          animation: rotate 2s ease-in-out infinite;
+        }
+
+        .fp-loading span:before{
+          content: '';
+          width: 40px;
+          height: 40px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          border-radius: 50%;
+          background: #377dff;
+          box-shadow: 0 0 30px #377dff;
+        }
+
+        .fp-loading span:nth-child(1){
+          animation-delay: 0.15s;
+        }
+
+        .fp-loading span:nth-child(2){
+          animation-delay: 0.3s;
+        }
+
+        .fp-loading span:nth-child(3){
+          animation-delay: 0.45s;
+        }
+
+        .fp-loading span:nth-child(4){
+          animation-delay: 0.6s;
+        }
+
+        .fp-loading span:nth-child(5){
+          animation-delay: 0.75s;
+        }
+
+        .fp-loading span:nth-child(6){
+          animation-delay: 0.9s;
+        }
+      </style>
+      <div class="fp-loading-container">
+        <div class="fp-loading">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <svg>
+          <filter id="gooey">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10"  result="blur"/>
+            <feColorMatrix in="blur" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -10"/>
+          </filter>
+        </svg>
+      </div>
+    </div>
+    
+    <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+    <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-ec7b5fe7.js"></script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-2566e2e0.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+  </body>
+</html>

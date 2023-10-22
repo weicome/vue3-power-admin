@@ -3,20 +3,28 @@ import type { SearchItemConfig } from '@/components/SearchModel'
 import { useComponent } from '@/components/SearchModel'
 import type { ColumnAttrs } from '@/components/TableModel'
 import { useSlotSwitch, useSlotTag } from '@/components/TableModel'
+import * as leaderApi from '@/api/member/leader'
 
 const { ElInput, ElSelect } = useComponent()
+export const leaders = reactive([{ label: '内部数据', value: 0 }])
+export const groupType = reactive([{ label: '电销组', value: 0 }, { label: '回访组', value: 1 }])
+leaderApi.memberLeaderIndex().then((res) => {
+  console.log(res)
+  res.data.forEach(item => leaders.push({ label: item.username, value: item.id }))
+})
 
 export enum SubmitTypeEnum {
   ADD = '新增',
   UPDATE = '编辑',
   IP = 'IP白名单',
-  STAT = '拨打统计'
+  STAT = '拨打统计',
+  BATCH = '批量添加'
 }
 
 // search model config
 export const config: SearchItemConfig[] = [
-  { component: ElSelect, label: '归属组长', field: 'leader_id', clearable: true, options: [{ label: '内部数据', value: '0' }, { label: 'cs', value: '1' }] },
-  { component: ElSelect, label: '组员类型', field: 'type', clearable: true, options: [{ label: '电销组', value: '0' }, { label: '回访组', value: '1' }] },
+  { component: ElSelect, label: '归属组长', field: 'leader_id', clearable: true, options: leaders },
+  { component: ElSelect, label: '组员类型', field: 'type', clearable: true, options: groupType },
   { component: ElInput, label: '组员手机号', field: 'name', placeholder: '请输入' }
 ]
 

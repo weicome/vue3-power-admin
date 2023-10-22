@@ -30,7 +30,7 @@
             handleUpdate(row)
           }, { type: 'success' }),
           useSlotButton('删除', () => {
-            handleDelete([row])
+            handleDelete(row)
           }, { type: 'danger' }),
           useSlotButton('IP白名单', () => {
             handleIpChange(row)
@@ -88,7 +88,7 @@
     Object.assign(submitForm, rowData)
     visible.value = true
   }
-  const handleDelete = (rows: MemberLeaderModel[]) => {
+  const handleDelete = (rows: MemberLeaderModel) => {
     $msgbox.confirm(
       '确认删除选中数据条目吗？',
       '提示',
@@ -98,11 +98,7 @@
         type: 'warning'
       }
     ).then(() => {
-      const ids: Array<string | number> = []
-      rows.forEach((item) => {
-        ids.push(item.id)
-      })
-      leaderApi.deleteMemberLeader<string | number>(ids).then(() => {
+      leaderApi.deleteMemberLeader<number>(rows.id).then(() => {
         $message.success('删除成功！')
         loadData()
       }).catch((e) => {
@@ -127,7 +123,7 @@
   function handleSubmit() {
     submitFormRef.value?.validate((valid) => {
       if (valid) {
-        if (submitType.value === SubmitTypeEnum.ADD) {
+        if (submitType.value.val === 0) {
           leaderApi.addMemberLeader(submitForm as MemberLeaderModel)
             .then(() => {
               visible.value = false
@@ -191,8 +187,17 @@
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="号码" prop="phone">
+        <el-form-item label="账号" prop="username">
+          <el-input v-model="submitForm.username" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="submitForm.password" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item label="手机号码" prop="phone">
           <el-input v-model="submitForm.phone" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="submitForm.email" placeholder="请输入" />
         </el-form-item>
       </el-form>
 
@@ -217,7 +222,7 @@
           <el-table-column prop="item" label="拨打结果统计" width="180" />
         </el-table>
       </el-form>
-      <template v-if="submitType.val !== 2" #footer>
+      <template v-if="submitType.val !== 3" #footer>
         <span class="dialog-footer">
           <el-button @click="visible = false">取消</el-button>
           <el-button type="primary" @click="handleSubmit">

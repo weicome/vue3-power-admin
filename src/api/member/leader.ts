@@ -7,7 +7,9 @@ export enum Api {
   Leader_ADD = '/member/leader/create',
   Leader_SHOW = '/member/leader/display',
   Leader_MOD = '/member/leader/modify',
-  Leader_DEL = '/member/leader/delete'
+  Leader_DEL = '/member/leader/delete',
+  Leader_LIST = '/member/leader/list',
+  Leader_STAT = '/member/leader/stat'
 }
 
 export const getMemberLeaderList = (data: ListQuery) => {
@@ -32,24 +34,23 @@ export const updateMemberLeader = (data: MemberLeaderModel) => {
     data
   })
 }
-export const deleteMemberLeader = <T>(data: Array<T>) => {
+export const deleteMemberLeader = <T>(data: T) => {
   return useFetch.POST<MemberLeaderModel>({
     url: Api.Leader_DEL,
     useMock: false,
-    data: { ids: data }
-  })
-}
-export const updateMemberLeaderIP = <T>(data: Array<T>) => {
-  return useFetch.POST<MemberLeaderModel>({
-    url: Api.Leader_DEL,
-    useMock: false,
-    data: { ids: data }
+    data: { id: data }
   })
 }
 export const telMemberLeaderStat = <T>(data: T) => {
   return useFetch.POST<MemberLeaderModel>({
-    url: Api.Leader_DEL,
+    url: Api.Leader_STAT,
     useMock: false,
     data
+  })
+}
+export const memberLeaderIndex = () => {
+  return useFetch.POST<ListResuorce<MemberLeaderModel>>({
+    url: Api.Leader_LIST,
+    useMock: false
   })
 }

@@ -18,7 +18,8 @@ function setTokenHelper({
   expires_in
 }: LoginResultModel) {
   createCookie(TokenTypeEnum.ACCESS_TOKEN, access_token, {
-    expires: expires_in / (24 * 60 * 60 - 10)
+    // expires: expires_in / (24 * 60 * 60 - 10)
+    expires: expires_in - 60
   })
   createCookie(TokenTypeEnum.REFRESH_TOKEN, refresh_token)
 }
@@ -71,11 +72,13 @@ export const useUserStore = defineStore('user', {
       this.$patch(accountInfo)
     },
 
-    logout(redirectUrl?: string) {
+    logout() {
       this.$reset()
       removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN])
+      console.log('111')
+      return true
       actAccountLogout().then(() => {
-        router.replace(`/login?redirect=${redirectUrl}`)
+        router.replace('/login')
       })
     }
   },

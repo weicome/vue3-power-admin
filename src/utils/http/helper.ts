@@ -38,6 +38,7 @@ export const transformResponse = (
     return res.data
   }
   const { code, data, message: msg } = res.data
+  console.log(code, msg)
   checkStatus(code, msg as string)
   if (code === CodeEnum.SUCCESS) {
     return data

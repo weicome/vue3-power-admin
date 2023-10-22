@@ -1,18 +1,17 @@
 <script setup lang="ts" name="Phone">
-  import { genFileId, type FormInstance, type FormRules, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
-  import { cloneDeep } from 'lodash-es'
-  import { config, staticColumns, SubmitTypeEnum } from './usePage'
-  import { getPhoneList, addPhone, updatePhone, deletePhone, uploadPhone } from '@/api/phone'
+  import { type FormInstance, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
+  import { leaders } from '../member/user/usePage'
+  import { config, staticColumns, SubmitTypeEnum, dataStatus, batchs } from './usePage'
+  import * as phoneApi from '@/api/phone'
   import type { PhoneModel } from '@/api/phone/model/PhoneModel'
   import SearchModel from '@/components/SearchModel'
-  import type { ColumnAttrs } from '@/components/TableModel'
   import { useMessage } from '@/hooks/web/useMessage'
-  import TableModel, { useSlotButton } from '@/components/TableModel'
+  import TableModel from '@/components/TableModel'
 
   const { $message, $msgbox } = useMessage()
   const tableModelRef = ref()
   const visible = ref(false)
-  const submitType = ref(SubmitTypeEnum.ADD)
+  const submitType = ref({ label: SubmitTypeEnum.ADD as string, val: 0 })
   const submitFormRef = ref<FormInstance>()
   const queryData = reactive<Record<string, any>>({
     phone: ''
@@ -26,30 +25,13 @@
   })
 
   const submitForm = reactive<Record<string, any>>({
-    leader_id: 0
+    leader_id: 0,
+    file: ''
   })
-  const columns = ref([
-    ...staticColumns,
-    {
-      fixed: 'right',
-      label: '操作',
-      width: '160',
-      slot: ({ row }: ColumnAttrs<PhoneModel>) =>
-        [
-
-          useSlotButton('编辑', () => {
-            handleUpdate(row)
-          }),
-          useSlotButton('删除', () => {
-            handleDelete([row])
-          }, { type: 'danger' })
-        ]
-    }
-  ])
   const loadData = () => {
     loading.value = true
     setTimeout(async () => {
-      const { data, meta } = await getPhoneList({
+      const { data, meta } = await phoneApi.getPhoneList({
         query: queryData,
         ...pagination
       })
@@ -78,80 +60,85 @@
     loadData()
   }
   const selectedData = ref<PhoneModel[]>([])
-  const handleButton = async (id: number) => {
+  const handleButton = async (val: number) => {
     Object.assign(submitForm, {})
-    submitType.value = SubmitTypeEnum.ADD
     visible.value = true
-  }
-  async function handleUpdate(row: PhoneModel) {
-    submitType.value = SubmitTypeEnum.UPDATE
-    const rowData = reactive(cloneDeep(toRaw(row)))
-    Object.assign(submitForm, rowData)
-    visible.value = true
-  }
-  const handleDelete = (rows: PhoneModel[]) => {
-    $msgbox.confirm(
-      '确认删除选中数据条目吗？',
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    ).then(() => {
-      const ids: Array<string | number> = []
-      rows.forEach((item) => {
-        ids.push(item.id)
+    if (val === 0) {
+      submitType.value = { label: SubmitTypeEnum.ADD, val }
+    }
+    else if (val === 1) {
+      submitType.value = { label: SubmitTypeEnum.EXPORT, val }
+    }
+    else if (val === 2) {
+      visible.value = false
+      submitType.value = { label: SubmitTypeEnum.ADD, val }
+      $msgbox.confirm(
+        '确定要清除所有的数据吗？',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        phoneApi.clearPhone().then(() => {
+          $message.success('删除成功！')
+          loadData()
+        }).catch((e) => {
+          $message.warning(e)
+        })
       })
-      deletePhone<string | number>(ids).then(() => {
-        $message.success('删除成功！')
-        loadData()
-      }).catch((e) => {
-        $message.warning(e)
-      })
-    })
+    }
+    else if (val === 3) {
+      submitType.value = { label: SubmitTypeEnum.BATCHDEL, val }
+    }
   }
-
-  function handleSubmit() {
-    submitFormRef.value?.validate((valid) => {
-      if (valid) {
-        if (submitType.value === SubmitTypeEnum.ADD) {
-          addPhone(submitForm as PhoneModel)
-            .then(() => {
-              visible.value = false
-              $message.success('保存成功！')
-              loadData()
-            }).catch((e) => {
-              $message.warning(e)
-            })
+  async function handleSubmit() {
+    let result: PhoneModel | null = null
+    if (submitType.value.val !== 2) {
+      submitFormRef.value?.validate(async (valid) => {
+        if (valid) {
+          if (submitType.value.val === 0) {
+            result = await phoneApi.addPhone(submitForm as PhoneModel)
+          }
+          else if (submitType.value.val === 1) {
+            result = await phoneApi.exportPhone(submitForm as PhoneModel)
+          }
+          else if (submitType.value.val === 3) {
+            result = await phoneApi.deletePhone(submitForm as PhoneModel)
+          }
+          if (result !== undefined || result !== null) {
+            visible.value = false
+            $message.success('操作成功！')
+            loadData()
+          }
+          else {
+            $message.warning('出现错误，请重试')
+          }
         }
         else {
-          updatePhone(submitForm)
-            .then(() => {
-              visible.value = false
-              $message.success('保存成功！')
-              loadData()
-            }).catch((e) => {
-              $message.warning(e)
-            })
+          $message.warning('请完善必填选项！')
         }
-      }
-      else {
-        $message.warning('请完善必填选项！')
-      }
-    })
+      })
+    }
+  }
+  const uploadRef = ref<UploadInstance>()
+  const formDatas = new FormData()
+  const submitUpload = () => {
+    if (submitForm.files !== '') {
+      phoneApi.uploadPhone(formDatas)
+        .then((res) => {
+          submitForm.file = res![0]
+          $message.success('上传成功')
+        }).catch((e) => {
+          $message.warning(e)
+        })
+    }
+  }
+  const fileChange = (val: any, fileList: any) => {
+    formDatas.append('file', val.raw)
   }
   loadData()
-  const uploadRef = ref<UploadInstance>()
-  const handleExceed: UploadProps['onExceed'] = (files) => {
-    uploadRef.value?.clearFiles()
-    const file = files[0] as UploadRawFile
-    file.uid = genFileId()
-    uploadRef.value!.handleStart(file)
-  }
-  const submitUpload = () => {
-    uploadRef.value!.submit()
-  }
 </script>
 
 <template>
@@ -181,7 +168,7 @@
       ref="tableModelRef"
       v-model:pagination="pagination"
       :loading="loading"
-      :columns="columns"
+      :columns="staticColumns"
       :data="tableData"
       row-key="id"
       @selection-change="handleSelectionChange"
@@ -190,34 +177,75 @@
     />
     <el-dialog
       v-model="visible"
-      :width="600"
-      :title="submitType"
+      :width="560"
+      :title="submitType.label"
       :show-close="false"
       :close-on-click-modal="false"
       @closed="submitFormRef?.resetFields()"
     >
       <el-form
+        v-if="submitType.val === 0"
         ref="submitFormRef"
         :model="submitForm"
         label-width="100px"
         style="width: 95%"
         status-icon
       >
-        <el-form-item label="号码" prop="phone">
-          <el-input v-model="submitForm.phone" placeholder="请输入" />
+        <el-form-item label="归属组长" prop="leader_id">
+          <el-select v-model="submitForm.leader_id" style="width: 100%">
+            <el-option v-for="(item, index) in leaders" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="批次" prop="batch">
-          <el-input v-model="submitForm.batch" placeholder="请输入" />
+        <el-form-item label="号码文件" prop="file">
+          <el-upload
+            ref="uploadRef"
+            :auto-upload="false"
+            :limit="1"
+            accept=".txt"
+            :with-credentials="true"
+            :on-change="fileChange"
+          >
+            <template #trigger>
+              <el-input v-model="submitForm.file" placeholder="请选择文件" />
+            </template>
+
+            <el-button class="ml-3" type="success" @click="submitUpload">
+              <div i-ri-upload-cloud-fill mr-1 /> 上传
+            </el-button>
+          </el-upload>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="submitForm.status">
-            <el-radio :label="1" border>
-              正常
-            </el-radio>
-            <el-radio :label="0" border>
-              禁用
-            </el-radio>
-          </el-radio-group>
+      </el-form>
+      <el-form
+        v-if="submitType.val === 1"
+        ref="submitFormRef"
+        :model="submitForm"
+        label-width="100px"
+        style="width: 95%"
+        status-icon
+      >
+        <el-form-item label="归属组长" prop="leader_id">
+          <el-select v-model="submitForm.leader_id" style="width: 100%">
+            <el-option v-for="(item, index) in leaders" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数据状态" prop="status">
+          <el-select v-model="submitForm.status" style="width: 100%">
+            <el-option v-for="(item, index) in dataStatus" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <el-form
+        v-if="submitType.val === 3"
+        ref="submitFormRef"
+        :model="submitForm"
+        label-width="100px"
+        style="width: 95%"
+        status-icon
+      >
+        <el-form-item label="批次信息" prop="leader_id">
+          <el-select v-model="submitForm.batch" style="width: 100%">
+            <el-option v-for="(item, index) in batchs" :key="index" :label="item.label" :value="item.value" />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>

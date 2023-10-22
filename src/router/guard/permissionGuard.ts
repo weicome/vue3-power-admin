@@ -17,8 +17,7 @@ export const createPermissionGuard = (router: Router) => {
       console.log('to', to.name)
       if (userStore.invalid) { // 未登录
         console.log('invalid', userStore.invalid)
-        return next()
-        next({ replace: true, name: 'login' })
+        return next({ replace: true, name: 'Login' })
       }
       else {
         if (!checkAccessToken()) { // 登录过期
