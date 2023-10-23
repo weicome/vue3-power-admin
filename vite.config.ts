@@ -39,7 +39,8 @@ export default ({ mode }: ConfigEnv) => {
     server: {
       host: true,
       port: VITE_PORT,
-      open: true,
+      // open: true,
+      cors: true,
       https: false,
       ...(VITE_USE_PROXY
         ? { proxy: createProxy(VITE_PROXY_PREFIX, VITE_BASE_API) }
