@@ -23,7 +23,7 @@ export const createPermissionGuard = (router: Router) => {
         if (!checkAccessToken()) { // 登录过期
           console.log('checkAccessToken', to.name)
           await userStore.reLogin()
-          await addAsyncRoutes()
+          // await addAsyncRoutes()
           return next()
         }
         else {

@@ -1,7 +1,7 @@
 export interface LoginParams {
   account: string
   password: string
-  rememberMe?: boolean
+  remember?: boolean
 }
 
 export interface LoginResultModel {

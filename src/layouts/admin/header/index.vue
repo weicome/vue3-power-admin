@@ -31,6 +31,11 @@
     locale.value = language
     $message.success(`${t('header.changeLocale')}: ${name}`)
   }
+  function logout() {
+    // $router.replace('/login?redirect=logout')
+    console.log(1)
+    useUserStore().logout()
+  }
 </script>
 
 <template>
@@ -98,7 +103,7 @@
               </el-dropdown-item>
               <el-dropdown-item
                 divided
-                @click="$router.replace('/login?redirect=logout')"
+                @click="logout()"
               >
                 <div i-ep-switch-button mr="1" />
                 {{ $t('header.logout') }}

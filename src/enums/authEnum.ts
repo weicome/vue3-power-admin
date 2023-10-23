@@ -10,5 +10,6 @@ export enum GrantTypeEnum {
 
 export enum TokenTypeEnum {
   ACCESS_TOKEN = 'ACCESS_TOKEN',
-  REFRESH_TOKEN = 'REFRESH_TOKEN'
+  REFRESH_TOKEN = 'REFRESH_TOKEN',
+  LARAVEL_TOKEN = 'laravel_session'
 }

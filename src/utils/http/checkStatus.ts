@@ -1,6 +1,7 @@
 import { ErrorCodeEnum } from '@/enums/httpEnum'
-import { useUserStore } from '@/store/modules/user'
+import { router } from '@/router'
 import { alertErrMsg } from '@/utils/message'
+import { useUserStore } from '@/store/modules/user'
 
 export const ErrorMsgMap = new Map<ErrorCodeEnum, string>([
   [ErrorCodeEnum.A100, '客户端请求错误!'],
@@ -22,6 +23,7 @@ const checkStatus: (status: number, msg: string, isCancel?: boolean) => void = (
   msg,
   isCancel = false
 ) => {
+  console.log(status, msg)
   if (!status) {
     const isAxiosTimeout = msg === ErrorMsgMap.get(ErrorCodeEnum.A200)
     if (isAxiosTimeout) {
@@ -44,8 +46,7 @@ const checkStatus: (status: number, msg: string, isCancel?: boolean) => void = (
       break
     case 401:
       alertErrMsg(ErrorCodeEnum.H401, ErrorMsgMap.get(ErrorCodeEnum.H401))
-      console.log('过期退出')
-      useUserStore().logout()
+      useUserStore().toLogin()
       break
     case 403:
       alertErrMsg(ErrorCodeEnum.H403, ErrorMsgMap.get(ErrorCodeEnum.H403))

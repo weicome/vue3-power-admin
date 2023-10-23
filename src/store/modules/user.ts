@@ -71,14 +71,18 @@ export const useUserStore = defineStore('user', {
       const accountInfo = await getAccountInfo()
       this.$patch(accountInfo)
     },
-
+    toLogin() {
+      this.$state = initialUserState
+      removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN, TokenTypeEnum.LARAVEL_TOKEN])
+      console.log('tologin')
+      console.log('reset', this.$state)
+      router.replace({ name: 'Login' })
+    },
     logout() {
-      this.$reset()
-      removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN])
-      console.log('111')
-      return true
+      this.$state = initialUserState
+      removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN, TokenTypeEnum.LARAVEL_TOKEN])
       actAccountLogout().then(() => {
-        router.replace('/login')
+        router.replace({ name: 'Login' })
       })
     }
   },

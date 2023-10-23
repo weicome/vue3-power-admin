@@ -61,11 +61,16 @@ export const getAccountInfo = () => {
 }
 
 export const actAccountLogout = () => {
-  return useFetch.POST({
-    url: Api.Logout,
-    withToken: true,
-    useMock: false
-  })
+  try {
+    return useFetch.POST({
+      url: Api.Logout,
+      withToken: false,
+      useMock: false
+    })
+  }
+  catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export const buildMenuApi = () => {

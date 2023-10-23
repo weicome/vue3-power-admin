@@ -9,12 +9,11 @@
 
   const { t } = useI18n()
   const router = useRouter()
-  const showVerifyDialog = ref(false)
   const { $notify, $message } = useMessage()
   const loginForm = reactive<LoginParams>({
     account: '',
     password: '',
-    rememberMe: false
+    remember: false
   })
   const loginFormRef = ref<FormInstance>()
   const loginRules = reactive<FormRules>({
@@ -31,24 +30,19 @@
       const [success] = await useLoginByPassword(loginForm)
       loading.value = false
       if (success) {
-        showVerifyDialog.value = true
+        $message.success({
+          message: '登录成功'
+        })
+        router.push('/home')
+        $notify({
+          title: 'Welcome',
+          message: t('home.welcome'),
+          type: 'success'
+        })
       }
       else {
         $message.error('账户名不存在或密码错误！')
       }
-    })
-  }
-
-  function handleVerifyChange(success: boolean) {
-    if (!success) return
-    $message.success({
-      message: '登录成功'
-    })
-    router.push('/home')
-    $notify({
-      title: 'Welcome',
-      message: t('home.welcome'),
-      type: 'success'
     })
   }
 </script>
@@ -87,7 +81,7 @@
         </el-form-item>
         <el-form-item>
           <div w="360px" flex="center" justify="between">
-            <el-checkbox v-model="loginForm.rememberMe">
+            <el-checkbox v-model="loginForm.remember">
               {{ $t('home.remember') }}
             </el-checkbox>
             <span
@@ -122,7 +116,6 @@
       <div i-ri-twitter-fill class="link" />
       <div i-ri-google-fill class="link" text="1.2rem!" />
     </div>
-    <VerifyDialog v-model="showVerifyDialog" @change="handleVerifyChange" />
   </div>
 </template>
 
