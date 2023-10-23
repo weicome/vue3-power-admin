@@ -1,12 +1,12 @@
 import type { App } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import { VITE_PUBLIC_PATH } from 'vite-env'
 
 import { basicRoutes } from './routes'
 
 export const router = createRouter({
-  history: createWebHistory(VITE_PUBLIC_PATH),
+  history: createWebHashHistory(),
   routes: basicRoutes as unknown as RouteRecordRaw[],
   // disabled tail-slash path
   strict: true,
