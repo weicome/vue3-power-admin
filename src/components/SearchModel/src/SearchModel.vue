@@ -51,7 +51,7 @@
       <template v-for="({ component, field, label, options, ...attrs }, index) in config" :key="field">
         <el-col v-show="showConfigCount > index" :span="colSpan">
           <el-form-item :label="label" :prop="field">
-            <component :is="getElComponent(component)" :model-value="formData[field]" v-bind="attrs" @input="handleChange(field, $event)" @change="handleChange(field, $event)">
+            <component :is="getElComponent(component)" :model-value="formData[field]" v-bind="attrs" @input="handleChange(field, $event as string)" @change="handleChange(field, $event as string)">
               <template v-if="component.name === ComponentName.ElSelect">
                 <el-option
                   v-for="opt in options"

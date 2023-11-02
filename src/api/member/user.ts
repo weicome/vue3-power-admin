@@ -1,5 +1,5 @@
 import type { ListQuery, ListResult, ListResuorce } from '../model/baseModel'
-import type { MemberUserModel } from './model/MemberModel'
+import type { MemberTelStatModel, MemberUserModel } from './model/MemberModel'
 import { useFetch } from '@/utils/http'
 
 export enum Api {
@@ -49,7 +49,7 @@ export const batchAddMemberUser = (data: any) => {
   })
 }
 export const telMemberUserStat = <T>(data: T) => {
-  return useFetch.POST<MemberUserModel>({
+  return useFetch.POST<Array<MemberTelStatModel>>({
     url: Api.USER_STAT,
     useMock: false,
     data

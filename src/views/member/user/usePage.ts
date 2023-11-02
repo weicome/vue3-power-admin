@@ -4,12 +4,12 @@ import { useComponent } from '@/components/SearchModel'
 import type { ColumnAttrs } from '@/components/TableModel'
 import { useSlotSwitch, useSlotTag } from '@/components/TableModel'
 import * as leaderApi from '@/api/member/leader'
+import * as memberUserApi from '@/api/member/user'
 
 const { ElInput, ElSelect } = useComponent()
 export const leaders = reactive([{ label: '内部数据', value: 0 }])
 export const groupType = reactive([{ label: '电销组', value: 0 }, { label: '回访组', value: 1 }])
 leaderApi.memberLeaderIndex().then((res) => {
-  console.log(res)
   res.data.forEach(item => leaders.push({ label: item.username, value: item.id }))
 })
 
@@ -32,7 +32,7 @@ export const config: SearchItemConfig[] = [
 export const staticColumns = [
   { fixed: true, type: 'selection', width: '55' },
   { fixed: true, prop: 'id', label: '编号', width: '70', align: 'center' },
-  { prop: 'leader_id', label: '归属组长', width: '120' },
+  { prop: 'leader_id', label: '归属组长', slot: ({ row }: ColumnAttrs<MemberUserModel>) => [useSlotTag(leaders.find(e => e.value === row.leader_id)?.label || '')] },
   { prop: 'type', label: '组员类型', width: '90', slot: ({ row }: ColumnAttrs<MemberUserModel>) => [useSlotTag(row?.type ? '回访组' : '电销组')] },
   { prop: 'username', label: '账号', width: '120' },
   { prop: 'phone', label: '手机号', width: '120' },
@@ -42,20 +42,24 @@ export const staticColumns = [
     label: '是否启用',
     width: '90',
     slot: ({ row }: ColumnAttrs<MemberUserModel>) =>
-      [useSlotSwitch('IP白名单', (index: number, val: any) => {
-        console.log(index)
-        row.status = !row.status as unknown as string
-      }, { value: row.status })]
+      [useSlotSwitch(row.status, (val: any) => {
+        const data = { ...row, ...{ status: Number(!row.status) } }
+        memberUserApi.updateMemberUser(data).then(() => {
+          row.status = Number(!row.status)
+        })
+      }, { modelValue: !!row.status })]
   },
   {
     prop: 'callback',
     label: '数据复播',
     width: '90',
     slot: ({ row }: ColumnAttrs<MemberUserModel>) =>
-      [useSlotSwitch('IP白名单', (index: number, val: any) => {
-        console.log(index)
-        row.callback = !row.callback as unknown as number
-      }, { value: row.callback })]
+      [useSlotSwitch(row.callback, (val: any) => {
+        const data = { ...row, ...{ callback: Number(!row.callback) } }
+        memberUserApi.updateMemberUser(data).then(() => {
+          row.callback = Number(!row.callback)
+        })
+      }, { modelValue: !!row.callback })]
   },
   { prop: 'created_at', label: '添加时间', width: '180' },
   { prop: 'lasted_at', label: '上次登录时间', width: '120' },

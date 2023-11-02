@@ -1,7 +1,8 @@
 import type { SearchItemConfig } from '@/components/SearchModel'
 import { useComponent } from '@/components/SearchModel'
-import type { ColumnAttrs } from '@/components/TableModel'
+import { useSlotSwitch, type ColumnAttrs } from '@/components/TableModel'
 import type { MemberLeaderModel } from '@/api/member/model/MemberModel'
+import * as leaderApi from '@/api/member/leader'
 
 const { ElInput, ElSelect } = useComponent()
 
@@ -26,19 +27,51 @@ export const staticColumns = [
   {
     prop: 'encry',
     label: '是否加密',
-    width: '180',
+    width: '120',
     slot: ({ row }: ColumnAttrs<MemberLeaderModel>) =>
-      [h('span', row.encry === 1 ? '是' : '否')]
+      [useSlotSwitch(row.encry, (val: any) => {
+        const data = { ...row, ...{ encry: Number(!row.encry) } }
+        leaderApi.updateMemberLeader(data).then(() => {
+          row.encry = Number(!row.encry)
+        })
+      }, { modelValue: !!row.encry })]
   },
   {
     prop: 'upload',
-    label: '是否上传文件',
-    width: '180',
+    label: '上传文件',
+    width: '120',
     slot: ({ row }: ColumnAttrs<MemberLeaderModel>) =>
-      [h('span', row.upload === 1 ? '正常' : '禁用')]
+      [useSlotSwitch(row.callback, (val: any) => {
+        const data = { ...row, ...{ upload: Number(!row.upload) } }
+        leaderApi.updateMemberLeader(data).then(() => {
+          row.upload = Number(!row.upload)
+        })
+      }, { modelValue: !!row.upload })]
   },
-  { prop: 'is_leader', label: '内部组长', width: '180' },
-  { prop: 'callback', label: '数据复播', width: '180' },
+  {
+    prop: 'is_leader',
+    label: '内部组长',
+    width: '120',
+    slot: ({ row }: ColumnAttrs<MemberLeaderModel>) =>
+      [useSlotSwitch(row.callback, (val: any) => {
+        const data = { ...row, ...{ is_leader: Number(!row.is_leader) } }
+        leaderApi.updateMemberLeader(data).then(() => {
+          row.is_leader = Number(!row.is_leader)
+        })
+      }, { modelValue: !!row.is_leader })]
+  },
+  {
+    prop: 'callback',
+    label: '数据复播',
+    width: '90',
+    slot: ({ row }: ColumnAttrs<MemberLeaderModel>) =>
+      [useSlotSwitch(row.callback, (val: any) => {
+        const data = { ...row, ...{ callback: Number(!row.callback) } }
+        leaderApi.updateMemberLeader(data).then(() => {
+          row.callback = Number(!row.callback)
+        })
+      }, { modelValue: !!row.callback })]
+  },
   { prop: 'created_at', label: '添加时间', width: '180' },
   { prop: 'lasted_at', label: '上次登录时间', width: '180' },
   { prop: 'lasted_ip', label: '上次登录IP', width: '180' }

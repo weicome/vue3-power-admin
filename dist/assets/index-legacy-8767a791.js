@@ -1,0 +1,1 @@
+System.register(["./index-legacy-013df0e1.js"],(function(t,e){"use strict";var a;return{setters:[t=>{a=t.e}],execute:function(){t("b",(t=>a.POST({url:"/stat/summary",useMock:!1,data:t}))),t("a",(t=>a.POST({url:"/stat/report",useMock:!1,data:t}))),t("g",(t=>a.POST({url:"/stat/batch",useMock:!1,data:t})))}}}));

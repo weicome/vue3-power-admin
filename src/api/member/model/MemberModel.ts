@@ -22,8 +22,12 @@ export interface MemberLeaderModel extends DateLogModel {
   email: string
   encry?: number
   upload?: number
-  in_leader?: number
+  is_leader?: number
   callback?: number
   lasted_at?: string
   lasted_ip?: string
+}
+export interface MemberTelStatModel {
+  label: string
+  value: number
 }

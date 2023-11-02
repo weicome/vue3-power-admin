@@ -25,7 +25,6 @@
       width: '160',
       slot: ({ row }: ColumnAttrs<MemberLeaderModel>) =>
         [
-
           useSlotButton('修改', () => {
             handleUpdate(row)
           }, { type: 'success' }),
@@ -42,7 +41,7 @@
     }
   ])
   const loadData = () => {
-    // loading.value = true
+    loading.value = true
     setTimeout(async () => {
       const { data, meta } = await leaderApi.getMemberLeaderList({ ...pagination })
       pagination.page = meta.pagination.current_page
@@ -58,12 +57,18 @@
     submitType.value = { label: SubmitTypeEnum.IP, val: 2 }
     visible.value = true
   }
+
+  const StatCount = ref('')
   const statData = reactive<Record<string, any>>({})
-  const handleStat = (row: MemberLeaderModel) => {
-    statData.value = leaderApi.telMemberLeaderStat({ id: row.id })
+  const handleStat = async (row: MemberLeaderModel) => {
+    const result = await leaderApi.telMemberLeaderStat({ id: row.id })
+    Object.assign(statData, result)
     submitType.value = { label: `组长《${row.username}》${SubmitTypeEnum.STAT}`, val: 3 }
+    const count = result?.reduce((total, obj) => total + obj.value, 0)
+    StatCount.value = `总拨打统计《${count}》`
     visible.value = true
   }
+
   const visible = ref(false)
   const submitType = ref({ label: SubmitTypeEnum.ADD as string, val: 0 })
   const submitFormRef = ref<FormInstance>()
@@ -98,7 +103,7 @@
         type: 'warning'
       }
     ).then(() => {
-      leaderApi.deleteMemberLeader<number>(rows.id).then(() => {
+      leaderApi.deleteMemberLeader<number>([rows.id]).then(() => {
         $message.success('删除成功！')
         loadData()
       }).catch((e) => {
@@ -213,19 +218,22 @@
         </el-form-item>
       </el-form>
 
-      <el-form
-        label-width="100px"
-        style="width: 95%"
-        status-icon
-      >
-        <el-table v-if="submitType.val === 3" :data="statData" border style="width: 200px">
-          <el-table-column prop="item" label="拨打结果统计" width="180" />
-        </el-table>
-      </el-form>
-      <template v-if="submitType.val !== 3" #footer>
+      <el-descriptions v-if="submitType.val === 3" :title="StatCount" :column="1" border>
+        <el-descriptions-item
+          v-for="(item, key) in statData"
+          :key="key"
+          :label="item.label"
+          label-align="center"
+          align="center"
+          width="150px"
+        >
+          {{ item.value }}
+        </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
         <span class="dialog-footer">
           <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">
+          <el-button v-if="submitType.val !== 3" type="primary" @click="handleSubmit">
             保存
           </el-button>
         </span>

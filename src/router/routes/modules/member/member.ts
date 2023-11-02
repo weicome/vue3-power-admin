@@ -7,7 +7,7 @@ const MemberRoute: AppRouteConfig = {
   redirect: '/member/users',
   meta: {
     title: '用户管理',
-    icon: 'ri:checkbox-multiple-fill'
+    icon: 'ri:file-user-fill'
   },
   children: [{
     path: 'users',

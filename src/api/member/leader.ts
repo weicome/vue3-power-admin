@@ -1,5 +1,5 @@
 import type { ListQuery, ListResult, ListResuorce } from '../model/baseModel'
-import type { MemberLeaderModel } from './model/MemberModel'
+import type { MemberLeaderModel, MemberTelStatModel } from './model/MemberModel'
 import { useFetch } from '@/utils/http'
 
 export enum Api {
@@ -34,15 +34,15 @@ export const updateMemberLeader = (data: MemberLeaderModel) => {
     data
   })
 }
-export const deleteMemberLeader = <T>(data: T) => {
+export const deleteMemberLeader = <T>(data: Array<T>) => {
   return useFetch.POST<MemberLeaderModel>({
     url: Api.Leader_DEL,
     useMock: false,
-    data: { id: data }
+    data: { ids: data }
   })
 }
 export const telMemberLeaderStat = <T>(data: T) => {
-  return useFetch.POST<MemberLeaderModel>({
+  return useFetch.POST<MemberTelStatModel[]>({
     url: Api.Leader_STAT,
     useMock: false,
     data

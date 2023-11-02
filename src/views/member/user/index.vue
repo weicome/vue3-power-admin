@@ -49,10 +49,15 @@
     submitType.value = { label: SubmitTypeEnum.IP, val: 2 }
     visible.value = true
   }
-  const statData = reactive<Record<string, any>>({})
-  const handleStat = (row: MemberUserModel) => {
-    statData.value = memberUserApi.telMemberUserStat({ id: row.id })
+  const StatCount = ref('')
+  const StatData = reactive<Record<string, any>>({})
+  const handleStat = async (row: MemberUserModel) => {
+    const result = await memberUserApi.telMemberUserStat({ id: row.id })
+    Object.assign(StatData, result)
+    StatCount.value = ''
     submitType.value = { label: `组员《${row.username}》${SubmitTypeEnum.STAT}`, val: 3 }
+    const count = result?.reduce((total, obj) => total + obj.value, 0)
+    StatCount.value = `总拨打统计《${count}》`
     visible.value = true
   }
   const tableData = ref<MemberUserModel[]>([])
@@ -243,6 +248,31 @@
           <el-input v-model="submitForm.email" placeholder="请输入" />
         </el-form-item>
       </el-form>
+
+      <el-form
+        v-if="submitType.val === 2 "
+        :model="submitFormIP"
+        label-width="100px"
+        style="width: 95%"
+        status-icon
+      >
+        <el-form-item label="新增IP" prop="ip">
+          <el-input v-model="submitFormIP.ip" placeholder="请输入" />
+        </el-form-item>
+      </el-form>
+
+      <el-descriptions v-if="submitType.val === 3" :title="StatCount" :column="1" border>
+        <el-descriptions-item
+          v-for="(item, key) in StatData"
+          :key="key"
+          :label="item.label"
+          label-align="center"
+          align="center"
+          width="150px"
+        >
+          {{ item.value }}
+        </el-descriptions-item>
+      </el-descriptions>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="visible = false">取消</el-button>

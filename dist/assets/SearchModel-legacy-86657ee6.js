@@ -1,0 +1,1 @@
+System.register(["./useColumn-legacy-301685aa.js","./index-legacy-013df0e1.js"],(function(e,t){"use strict";var s,c;return{setters:[e=>{s=e._},e=>{c=e._}],execute:function(){e("S",c(s,[["__scopeId","data-v-2357b546"]]))}}}));

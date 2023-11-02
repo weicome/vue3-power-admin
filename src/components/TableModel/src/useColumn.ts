@@ -56,14 +56,10 @@ export const useSlotTag = (text: string, onClick?: () => void, props: SlotTagPro
     }
   )
 }
-export const useSlotSwitch = (value: any, onClick?: (index: number, val: any) => void, props: SlotSwitch = {}) => {
-  const defaultProps: SlotSwitch = {
-    size: 'default'
-  }
+export const useSlotSwitch = (value: any, onClick?: (val: any) => void, props: SlotSwitch = {}) => {
   return h(
     ElSwitch,
     {
-      ...defaultProps,
       ...props,
       onClick
     },

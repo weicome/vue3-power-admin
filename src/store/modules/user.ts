@@ -72,9 +72,9 @@ export const useUserStore = defineStore('user', {
       this.$patch(accountInfo)
     },
     toLogin() {
+      this.$reset()
       this.$state = initialUserState
       removeCookies([TokenTypeEnum.ACCESS_TOKEN, TokenTypeEnum.REFRESH_TOKEN, TokenTypeEnum.LARAVEL_TOKEN])
-      console.log('tologin')
       console.log('reset', this.$state)
       router.replace({ name: 'Login' })
     },

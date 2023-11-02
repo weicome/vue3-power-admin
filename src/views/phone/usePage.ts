@@ -1,5 +1,5 @@
-import { leaders } from '../member/user/usePage'
 import type { PhoneModel } from './../../api/phone/model/PhoneModel'
+import { leaders } from '@/views/member/user/usePage'
 import type { SearchItemConfig } from '@/components/SearchModel'
 import { useComponent } from '@/components/SearchModel'
 import { useSlotTag } from '@/components/TableModel'
@@ -29,6 +29,7 @@ export const dataStatus = [
   { label: '直接挂断', value: 5 },
   { label: '关机/停机/空号', value: -1 }
 ]
+
 // search model config
 export const config: SearchItemConfig[] = [
   { component: ElSelect, label: '数据归属', field: 'leader_id', clearable: true, options: leaders },
@@ -40,20 +41,8 @@ export const config: SearchItemConfig[] = [
 export const staticColumns = [
   { fixed: true, prop: 'id', label: '编号', width: '70', align: 'center' },
   { prop: 'phone', label: '手机号' },
-  {
-    prop: 'leader_id',
-    label: '归属组长',
-    slot: ({ row }: ColumnAttrs<PhoneModel>) => {
-      return leaders?.map(item => item.value === row.leader_id && useSlotTag(item.label || ''))
-    }
-  },
-  {
-    prop: 'status',
-    label: '数据步骤',
-    slot: ({ row }: ColumnAttrs<PhoneModel>) => {
-      return dataStatus?.map(item => item.value === row.status && useSlotTag(item.label || ''))
-    }
-  },
+  { prop: 'leader_id', label: '归属组长', slot: ({ row }: ColumnAttrs<PhoneModel>) => [useSlotTag(leaders.find(e => e.value === row.leader_id)?.label || '')] },
+  { prop: 'status', label: '数据步骤', slot: ({ row }: ColumnAttrs<PhoneModel>) => [useSlotTag(dataStatus.find(item => item.value === row.status)?.label || '')] },
   { prop: 'batch', label: '批次' },
   { prop: 'created_at', label: '添加时间' }
 ] as Column[]
